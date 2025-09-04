@@ -3,8 +3,11 @@ import type {HeaderProps} from "../types";
 import {WeddingInfoCard} from "./WeddingInfoCard.tsx";
 import {CircularImage} from "./common/CircularImage.tsx";
 import {FloatingPetals} from "./FloatingPetals.tsx";
-import HeroCouple from '../assets/images/HeroCouple.webp';
-import Background from '../assets/images/Background.webp';
+// import HeroCouple from '../assets/images/HeroCouple.webp';
+// import Background from '../assets/images/Background.webp';
+
+const Background = 'https://cdn.jsdelivr.net/gh/hiennm99/wedding-website@main/src/assets/images/Background.webp'
+const HeroCouple = 'https://cdn.jsdelivr.net/gh/hiennm99/wedding-website@main/src/assets/images/HeroCouple.webp';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
     const handleOpenModal = useCallback(() => {

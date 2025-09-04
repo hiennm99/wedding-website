@@ -1,7 +1,9 @@
 import {useState, useRef} from "react";
 import {useNavigate} from "react-router";
 import {FloatingPetals} from "./FloatingPetals.tsx";
-import BackgroundMusic from '../assets/musics/BackgroundMusic.mp3'
+// import BackgroundMusic from '../assets/musics/BackgroundMusic.mp3'
+
+const BackgroundMusic = 'https://cdn.jsdelivr.net/gh/hiennm99/wedding-website@main/src/assets/musics/BackgroundMusic.mp3';
 
 // Wedding Music Component
 export const WeddingMusic: React.FC = () => {

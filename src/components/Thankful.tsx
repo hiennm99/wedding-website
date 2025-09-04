@@ -1,6 +1,8 @@
 import React from "react";
-import GalleryCouple from "../assets/images/GalleryCouple.webp";
+// import GalleryCouple from "../assets/images/GalleryCouple.webp";
 import {CircularImage} from "./common/CircularImage.tsx";
+
+const GalleryCouple = 'https://cdn.jsdelivr.net/gh/hiennm99/wedding-website@main/src/assets/images/GalleryCouple.mp3';
 
 export const Thankful: React.FC = () => {
     return (
