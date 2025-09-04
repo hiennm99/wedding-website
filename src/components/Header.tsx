@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
                         onClick={handleOpenModal}
                         className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 tracking-wider uppercase shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-rose-500 animate-pulse"
                     >
-                        ✨ XÁC NHẬN THAM DỰ ✨
+                        ✨ JOIN WITH US ✨
                     </button>
                 </div>
 

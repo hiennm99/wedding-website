@@ -70,6 +70,7 @@ const AppRoutes: React.FC = () => {
         { url: 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp', type: 'image' as const },
         { url: 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/HeroCouple.webp', type: 'image' as const },
         { url: 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/GalleryCouple.webp', type: 'image' as const },
+        { url: 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/WeddingCard.webp', type: 'image' as const },
         { url: 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/musics/BackgroundMusic.mp3', type: 'audio' as const }
     ];
 
