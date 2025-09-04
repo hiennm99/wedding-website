@@ -1,4 +1,6 @@
-// databaseService.ts
+// databaseService.ts - Supabase version with better error handling and no any types
+
+import { createClient, SupabaseClient, PostgrestError, AuthError } from '@supabase/supabase-js';
 
 // Types
 interface AttendeeData {
@@ -8,130 +10,223 @@ interface AttendeeData {
     message: string;
 }
 
-interface ServiceResponse {
+interface ServiceResponse<T = unknown> {
     success: boolean;
     message: string;
-    data?: any;
-    error?: any;
+    data?: T;
+    error?: Error | PostgrestError | AuthError | unknown;
 }
 
+// Database schema type
+type Database = {
+    public: {
+        Tables: {
+            attendees: {
+                Row: AttendeeData & {
+                    id?: number;
+                    created_at?: string;
+                };
+                Insert: AttendeeData;
+                Update: Partial<AttendeeData>;
+            };
+        };
+        Views: {
+            [_ in never]: never;
+        };
+        Functions: {
+            [_ in never]: never;
+        };
+        Enums: {
+            [_ in never]: never;
+        };
+        CompositeTypes: {
+            [_ in never]: never;
+        };
+    };
+};
+
 class DatabaseService {
-    private apiUrl: string;
+    private supabase: SupabaseClient | null = null;
+    private isConfigured = false;
 
     constructor() {
-        // Cloudflare Pages Functions API URL
-        this.apiUrl = '/api/attendees';
-    }
-
-    // Insert data vào Cloudflare D1 Database
-    async insertData(data: AttendeeData | AttendeeData[]): Promise<ServiceResponse> {
         try {
-            const dataArray = Array.isArray(data) ? data : [data];
+            // Get environment variables
+            const supabaseUrl = 'https://agcgbihujvgkemhglthq.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY2diaWh1anZna2VtaGdsdGhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5NzEwNzUsImV4cCI6MjA3MjU0NzA3NX0.5Cx-VOZIcnhdA800THsBPh2DdMzgXlKqsWNiijKz1GQ';
 
-            console.log('Sending data to Cloudflare D1:', dataArray);
+            console.log('Supabase URL:', supabaseUrl ? 'Found' : 'Missing');
+            console.log('Supabase Key:', supabaseKey ? 'Found' : 'Missing');
 
-            const response = await fetch(this.apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ attendees: dataArray })
-            });
-
-            const result = await response.json();
-            console.log('Cloudflare D1 response:', result);
-
-            if (response.ok && result.success) {
-                return {
-                    success: true,
-                    message: result.message || `Đã thêm ${dataArray.length} record(s) thành công!`,
-                    data: result.data
-                };
-            } else {
-                return {
-                    success: false,
-                    message: result.message || 'Lỗi khi thêm data',
-                    error: result.error
-                };
+            if (!supabaseUrl || !supabaseKey) {
+                console.error('❌ Missing Supabase environment variables');
+                console.log('Make sure you have:');
+                console.log('- NEXT_PUBLIC_SUPABASE_URL or VITE_SUPABASE_URL');
+                console.log('- NEXT_PUBLIC_SUPABASE_ANON_KEY or VITE_SUPABASE_ANON_KEY');
+                this.isConfigured = false;
+                return;
             }
-        } catch (error: any) {
-            console.error('Insert data error:', error);
-            return {
-                success: false,
-                message: 'Lỗi kết nối: ' + error.message,
-                error: error
-            };
+
+            this.supabase = createClient(supabaseUrl, supabaseKey, {
+                auth: {
+                    persistSession: false // Don't persist auth for simple insert
+                }
+            });
+            this.isConfigured = true;
+            console.log('✅ Supabase configured successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize Supabase:', error);
+            this.isConfigured = false;
         }
     }
 
-    // Get all attendees from Cloudflare D1
-    async getAttendees(): Promise<ServiceResponse> {
-        try {
-            console.log('Fetching data from Cloudflare D1...');
-
-            const response = await fetch(this.apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const result = await response.json();
-            console.log('Cloudflare D1 get response:', result);
-
-            if (response.ok && result.success) {
-                return {
-                    success: true,
-                    message: result.message || 'Lấy data thành công!',
-                    data: result.data
-                };
-            } else {
-                return {
-                    success: false,
-                    message: result.message || 'Lỗi khi lấy data',
-                    error: result.error
-                };
-            }
-        } catch (error: any) {
-            console.error('Get data error:', error);
+    // Insert data vào Supabase
+    async insertData(data: AttendeeData | AttendeeData[]): Promise<ServiceResponse<AttendeeData[]>> {
+        if (!this.isConfigured || !this.supabase) {
             return {
                 success: false,
-                message: 'Lỗi kết nối: ' + error.message,
+                message: 'Supabase chưa được cấu hình đúng. Kiểm tra environment variables.',
+                error: new Error('Configuration error')
+            };
+        }
+
+        try {
+            const dataArray = Array.isArray(data) ? data : [data];
+
+            console.log('🚀 Inserting data to Supabase:', dataArray);
+
+            // Test connection first
+            const { error: testError } = await this.supabase
+                .from('attendees')
+                .select('*')
+                .limit(1);
+
+            if (testError) {
+                console.error('❌ Connection test failed:', testError);
+                return {
+                    success: false,
+                    message: 'Không thể kết nối database. Kiểm tra cấu hình Supabase.',
+                    error: testError
+                };
+            }
+
+            // Insert data
+            const { data: result, error } = await this.supabase
+                .from('attendees')
+                .insert(dataArray)
+                .select();
+
+            if (error) {
+                console.error('❌ Supabase insert error:', error);
+
+                // Handle specific errors
+                if ('code' in error && error.code === 'PGRST116') {
+                    return {
+                        success: false,
+                        message: 'Table "attendees" không tồn tại. Vui lòng tạo table trong Supabase.',
+                        error: error
+                    };
+                }
+
+                if ('code' in error && error.code === '42501') {
+                    return {
+                        success: false,
+                        message: 'Không có quyền insert. Kiểm tra RLS policies trong Supabase.',
+                        error: error
+                    };
+                }
+
+                const errorMessage = 'message' in error ? error.message : 'Unknown error';
+                return {
+                    success: false,
+                    message: 'Lỗi database: ' + errorMessage,
+                    error: error
+                };
+            }
+
+            console.log('✅ Supabase insert success:', result);
+            return {
+                success: true,
+                message: `Đã xác nhận tham dự thành công! 🎉`,
+                data: result as AttendeeData[]
+            };
+
+        } catch (error: unknown) {
+            console.error('❌ Insert data error:', error);
+
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorName = error instanceof Error ? error.name : 'UnknownError';
+
+            if (errorName === 'TypeError' && errorMessage.includes('fetch')) {
+                return {
+                    success: false,
+                    message: 'Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.',
+                    error: error
+                };
+            }
+
+            return {
+                success: false,
+                message: 'Lỗi không xác định: ' + errorMessage,
                 error: error
             };
         }
     }
 
     // Test connection
-    async testConnection(): Promise<ServiceResponse> {
-        try {
-            const response = await fetch(this.apiUrl);
-            const result = await response.json();
-
-            if (response.ok) {
-                return {
-                    success: true,
-                    message: 'Kết nối D1 database thành công!',
-                    data: result
-                };
-            } else {
-                return {
-                    success: false,
-                    message: 'Không thể kết nối D1 database',
-                    error: result
-                };
-            }
-        } catch (error: any) {
+    async testConnection(): Promise<ServiceResponse<AttendeeData[]>> {
+        if (!this.isConfigured || !this.supabase) {
             return {
                 success: false,
-                message: 'Lỗi kết nối: ' + error.message,
+                message: 'Supabase chưa được cấu hình',
+                error: new Error('Configuration error')
+            };
+        }
+
+        try {
+            console.log('🔍 Testing Supabase connection...');
+
+            const { data, error } = await this.supabase
+                .from('attendees')
+                .select('*')
+                .limit(1);
+
+            if (error) {
+                console.error('❌ Connection test failed:', error);
+                const errorMessage = 'message' in error ? error.message : 'Unknown connection error';
+                return {
+                    success: false,
+                    message: 'Không thể kết nối Supabase: ' + errorMessage,
+                    error: error
+                };
+            }
+
+            console.log('✅ Supabase connection successful');
+            return {
+                success: true,
+                message: 'Kết nối Supabase thành công!',
+                data: data as AttendeeData[]
+            };
+
+        } catch (error: unknown) {
+            console.error('❌ Connection error:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown connection error';
+
+            return {
+                success: false,
+                message: 'Lỗi kết nối: ' + errorMessage,
                 error: error
             };
         }
+    }
+
+    // Check configuration
+    isReady(): boolean {
+        return this.isConfigured && this.supabase !== null;
     }
 }
 
 // Export service
 const databaseService = new DatabaseService();
 export default databaseService;
-export type { AttendeeData, ServiceResponse };
+export type { AttendeeData, ServiceResponse, Database };

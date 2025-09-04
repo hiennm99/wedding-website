@@ -6,8 +6,8 @@ import {FloatingPetals} from "./FloatingPetals.tsx";
 // import HeroCouple from '../assets/images/HeroCouple.webp';
 // import Background from '../assets/images/Background.webp';
 
-const Background = 'https://cdn.jsdelivr.net/gh/hiennm99/wedding-website@main/src/assets/images/Background.webp'
-const HeroCouple = 'https://cdn.jsdelivr.net/gh/hiennm99/wedding-website@main/src/assets/images/HeroCouple.webp';
+const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
+const HeroCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/HeroCouple.webp';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
     const handleOpenModal = useCallback(() => {

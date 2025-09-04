@@ -1,5 +1,0 @@
-# SPA fallback for React Router
-/* /index.html 200
-
-# API routes - forward to functions
-/api/* /api/:splat 200

@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import {useNavigate} from "react-router";
 import type {VoteModalProps} from "../../types";
 import {useFormState} from "../../hooks/useFormState.ts";
@@ -10,6 +10,8 @@ import databaseService, { type AttendeeData } from "../../services/databaseServi
 
 export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const {
         attendee, setAttendee,
         joinable, setJoinable,
@@ -25,7 +27,9 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
             return;
         }
 
-        // Format data for Cloudflare D1
+        setIsSubmitting(true);
+
+        // Format data for Supabase
         const formData: AttendeeData = {
             attendee: attendee.trim(),
             joinable: joinable ? 'Có' : 'Không',
@@ -33,13 +37,14 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
             message: message.trim()
         };
 
-        console.log('Submitting to Cloudflare D1:', formData);
+        console.log('Submitting to Supabase:', formData);
 
         try {
             const result = await databaseService.insertData(formData);
 
             if (result.success) {
                 console.log('Success:', result.message);
+                // Navigate and cleanup
                 navigate('/thankful');
                 resetForm();
                 onClose();
@@ -50,13 +55,16 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
         } catch (error) {
             console.error('Submit error:', error);
             alert('❌ Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
+        } finally {
+            setIsSubmitting(false);
         }
     }, [attendee, transport, message, joinable, resetForm, onClose, navigate]);
 
     const handleClose = useCallback(() => {
+        if (isSubmitting) return; // Prevent close while submitting
         resetForm();
         onClose();
-    }, [resetForm, onClose]);
+    }, [resetForm, onClose, isSubmitting]);
 
     // Prevent scroll when modal is open
     useMemo(() => {
@@ -84,7 +92,8 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
             <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={handleClose}
-                    className="sticky top-4 right-4 ml-auto w-8 h-8 flex items-center justify-center rounded-full bg-pink-100 hover:bg-pink-200 transition-colors z-10 text-pink-600 text-xl"
+                    disabled={isSubmitting}
+                    className="sticky top-4 right-4 ml-auto w-8 h-8 flex items-center justify-center rounded-full bg-pink-100 hover:bg-pink-200 transition-colors z-10 text-pink-600 text-xl disabled:opacity-50"
                     aria-label="Đóng modal"
                 >
                     ×
@@ -105,6 +114,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                             placeholder="Vui lòng nhập họ và tên..."
                             className="w-full bg-white border-2 border-pink-200 rounded-xl px-4 py-3 text-rose-700 placeholder-pink-400 font-light focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm"
                             required
+                            disabled={isSubmitting}
                         />
                     </FormSection>
 
@@ -113,12 +123,12 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                         <div className="flex flex-col sm:flex-row gap-3">
                             <RadioButton
                                 checked={joinable}
-                                onClick={() => setJoinable(true)}
+                                onClick={() => !isSubmitting && setJoinable(true)}
                                 label="🎉 Có, tôi sẽ tham dự"
                             />
                             <RadioButton
                                 checked={!joinable}
-                                onClick={() => setJoinable(false)}
+                                onClick={() => !isSubmitting && setJoinable(false)}
                                 label="😢 Không thể tham dự"
                             />
                         </div>
@@ -132,7 +142,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                                     <RadioButton
                                         key={item.value}
                                         checked={transport === item.value}
-                                        onClick={() => setTransport(item.value)}
+                                        onClick={() => !isSubmitting && setTransport(item.value)}
                                         label={item.label}
                                     />
                                 ))}
@@ -148,15 +158,25 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                             placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
                             className="w-full bg-white border-2 border-pink-200 rounded-xl px-4 py-3 text-rose-700 placeholder-pink-400 font-light focus:outline-none focus:ring-2 focus:ring-rose-400 resize-none text-sm"
                             rows={3}
+                            disabled={isSubmitting}
                         />
                     </FormSection>
 
                     <button
                         onClick={handleSubmit}
-                        disabled={!attendee.trim()}
-                        className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-6 py-3 rounded-full font-light transition-all duration-300 tracking-wider text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                        disabled={!attendee.trim() || isSubmitting}
+                        className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-6 py-3 rounded-full font-light transition-all duration-300 tracking-wider text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                     >
-                        ✨ GỬI XÁC NHẬN ✨
+                        {isSubmitting ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Đang gửi...
+                            </>
+                        ) : (
+                            <>
+                                ✨ GỬI XÁC NHẬN ✨
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
