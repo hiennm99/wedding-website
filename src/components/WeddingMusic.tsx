@@ -2,12 +2,14 @@ import React, {useState, useRef, useEffect} from "react";
 import {useNavigate} from "react-router";
 import {FloatingPetals} from "./FloatingPetals.tsx";
 import {LoadingScreen} from "./LoadingScreen.tsx";
+import {detectMobile} from "../hooks/detectMobile.ts";
 
 const BackgroundMusic = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/musics/BackgroundMusic.mp3';
 const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
 const Envelope = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Envelope.webp';
 
 export const WeddingMusic: React.FC = () => {
+    const isMobile = detectMobile();
     const navigate = useNavigate();
     const [showWelcome, setShowWelcome] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -158,20 +160,21 @@ export const WeddingMusic: React.FC = () => {
                                         </>
                                     )}
 
-                                    {/* Extra magical particles khi showHint */}
+                                    {/* Extra magical particles khi showHint - More on mobile */}
                                     {showHint && (
                                         <>
-                                            {[...Array(8)].map((_, i) => (
+                                            {[...Array(isMobile ? 12 : 8)].map((_, i) => (
                                                 <div
                                                     key={i}
-                                                    className="absolute bg-white rounded-full animate-ping shadow-lg"
+                                                    className={`absolute bg-white rounded-full shadow-lg ${isMobile ? 'animate-ping' : 'animate-ping'}`}
                                                     style={{
                                                         top: `${20 + Math.random() * 60}%`,
                                                         left: `${10 + Math.random() * 80}%`,
-                                                        width: `${Math.random() * 8 + 4}px`,
-                                                        height: `${Math.random() * 8 + 4}px`,
+                                                        width: `${Math.random() * (isMobile ? 10 : 8) + (isMobile ? 6 : 4)}px`,
+                                                        height: `${Math.random() * (isMobile ? 10 : 8) + (isMobile ? 6 : 4)}px`,
                                                         animationDelay: `${Math.random() * 1}s`,
-                                                        opacity: 0.7
+                                                        opacity: isMobile ? 0.9 : 0.7,
+                                                        animationDuration: isMobile ? '1s' : '1.5s'
                                                     }}
                                                 />
                                             ))}
