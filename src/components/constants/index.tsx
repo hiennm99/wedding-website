@@ -8,7 +8,7 @@ export const TRANSPORT_OPTIONS: TransportOption[] = [
 ];
 
 export const WEDDING_INFO = {
-    date: '28 tháng 09 năm 2025 | 11:00 AM',
-    venue: 'Nhà hàng tiệc cưới Hồng Ân',
+    date: 'September 28, 2025 | 11:00 AM',
+    venue: 'Hong An Wedding Restaurant',
     address: 'Ấp 3, Lộc Hưng, Đồng Nai'
 };

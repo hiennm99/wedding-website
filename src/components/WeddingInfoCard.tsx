@@ -22,9 +22,6 @@ export const WeddingInfoCard: React.FC = () => (
                             </div>
                             <div className="flex-1">
                                 <h4 className="text-rose-600 font-semibold mb-2 text-lg">{WEDDING_INFO.venue}</h4>
-                                <p className="text-pink-600 font-light leading-relaxed">
-                                    {WEDDING_INFO.address}
-                                </p>
                             </div>
                         </div>
 

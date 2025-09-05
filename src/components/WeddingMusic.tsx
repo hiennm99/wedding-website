@@ -65,12 +65,12 @@ export const WeddingMusic: React.FC = () => {
         // Auto text blinking every 1 second
         const textInterval = setInterval(() => {
             setShowText(prev => !prev);
-        }, 1500);
+        }, 2000);
 
         // Auto hover effect - cycles every 2 seconds
         const hoverInterval = setInterval(() => {
             setAutoHover(prev => !prev);
-        }, 1500);
+        }, 2000);
 
         // Auto play audio after 2 seconds
         const audioTimer = setTimeout(() => {
@@ -91,16 +91,16 @@ export const WeddingMusic: React.FC = () => {
     // Generate bubbles for transition
     const generateBubbles = useCallback(() => {
         const newBubbles: Bubble[] = [];
-        const bubbleCount = isMobile ? 60 : 100;
+        const bubbleCount = isMobile ? 40 : 60; // Giảm số lượng bubble
 
         for (let i = 0; i < bubbleCount; i++) {
             newBubbles.push({
                 id: i,
                 x: Math.random() * 100,
                 y: Math.random() * 100,
-                size: Math.random() * 40 + 10,
-                delay: Math.random() * 2,
-                duration: Math.random() * 2 + 3,
+                size: Math.random() * 30 + 8, // Giảm size
+                delay: Math.random() * 0.5, // Giảm delay từ 2s xuống 0.5s
+                duration: Math.random() * 1 + 1.5, // Giảm duration từ 2+3 xuống 1+1.5
                 opacity: Math.random() * 0.7 + 0.3
             });
         }
@@ -127,7 +127,7 @@ export const WeddingMusic: React.FC = () => {
         setTimeout(() => {
             setShowWelcome(false);
             navigate('/home');
-        }, 3500); // 3.5 seconds for full bubble transition
+        }, 800); // 3.5 seconds for full bubble transition
     };
 
     // Show loading screen when transitioning
