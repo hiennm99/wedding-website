@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useRef, useEffect, useCallback} from "react";
 import {useNavigate} from "react-router";
 import {FloatingPetals} from "./FloatingPetals.tsx";
 import {LoadingScreen} from "./LoadingScreen.tsx";
@@ -8,15 +8,27 @@ const BackgroundMusic = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com
 const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
 const Envelope = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Envelope.webp';
 
+interface Bubble {
+    id: number;
+    x: number;
+    y: number;
+    size: number;
+    delay: number;
+    duration: number;
+    opacity: number;
+}
+
 export const WeddingMusic: React.FC = () => {
     const isMobile = detectMobile();
     const navigate = useNavigate();
     const [showWelcome, setShowWelcome] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [isBubbleTransition, setIsBubbleTransition] = useState(false);
+    const [bubbles, setBubbles] = useState<Bubble[]>([]);
     const [loadingProgress, ] = useState(0);
     const [currentlyLoading, ] = useState('');
     const [showText, setShowText] = useState(false);
-    const [autoHover, setAutoHover] = useState(false); // Auto hover effect
+    const [autoHover, setAutoHover] = useState(false);
     const [, setParticles] = useState<Array<{
         id: number;
         x: number;
@@ -55,10 +67,10 @@ export const WeddingMusic: React.FC = () => {
             setShowText(prev => !prev);
         }, 1000);
 
-        // Auto hover effect - cycles every 3 seconds
+        // Auto hover effect - cycles every 2 seconds
         const hoverInterval = setInterval(() => {
             setAutoHover(prev => !prev);
-        }, 800);
+        }, 2000);
 
         // Auto play audio after 2 seconds
         const audioTimer = setTimeout(() => {
@@ -67,7 +79,7 @@ export const WeddingMusic: React.FC = () => {
             } catch (error) {
                 console.error('Audio auto play failed:', error);
             }
-        }, 1000);
+        }, 2000);
 
         return () => {
             clearInterval(textInterval);
@@ -75,6 +87,25 @@ export const WeddingMusic: React.FC = () => {
             clearTimeout(audioTimer);
         };
     }, []);
+
+    // Generate bubbles for transition
+    const generateBubbles = useCallback(() => {
+        const newBubbles: Bubble[] = [];
+        const bubbleCount = isMobile ? 60 : 100;
+
+        for (let i = 0; i < bubbleCount; i++) {
+            newBubbles.push({
+                id: i,
+                x: Math.random() * 100,
+                y: Math.random() * 100,
+                size: Math.random() * 40 + 10,
+                delay: Math.random() * 2,
+                duration: Math.random() * 2 + 3,
+                opacity: Math.random() * 0.7 + 0.3
+            });
+        }
+        setBubbles(newBubbles);
+    }, [isMobile]);
 
     const handleOpenCard = async () => {
         if (isTransitioning) return;
@@ -87,15 +118,20 @@ export const WeddingMusic: React.FC = () => {
         }
 
         setIsTransitioning(true);
-        setShowWelcome(false);
+        setIsBubbleTransition(true);
 
+        // Generate bubbles for transition
+        generateBubbles();
+
+        // Wait for bubble animation to complete
         setTimeout(() => {
+            setShowWelcome(false);
             navigate('/home');
-        }, 100);
+        }, 3500); // 3.5 seconds for full bubble transition
     };
 
-    // Show loading screen khi đang transition
-    if (isTransitioning) {
+    // Show loading screen when transitioning
+    if (isTransitioning && !isBubbleTransition) {
         return (
             <LoadingScreen
                 progress={loadingProgress}
@@ -106,22 +142,32 @@ export const WeddingMusic: React.FC = () => {
         );
     }
 
-    // Welcome screen
+    // Welcome screen with bubble transition
     if (showWelcome) {
         return (
             <div className="fixed inset-0 overflow-hidden">
                 {/* Background layers */}
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100" />
+                <div className={`absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100 transition-all duration-2000 ${
+                    isBubbleTransition ? 'opacity-0 scale-110' : 'opacity-100'
+                }`} />
                 <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+                    className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 transition-all duration-2000 ${
+                        isBubbleTransition ? 'opacity-0 scale-110' : 'opacity-20'
+                    }`}
                     style={{ backgroundImage: `url(${Background})` }}
                 />
 
                 {/* Floating petals */}
-                <FloatingPetals count={isMobile ? 30 : 50} />
+                <div className={`transition-all duration-2000 ${
+                    isBubbleTransition ? 'opacity-0 scale-150' : 'opacity-100'
+                }`}>
+                    <FloatingPetals count={isMobile ? 30 : 50} />
+                </div>
 
                 {/* Main content container */}
-                <div className="relative z-10 flex items-center justify-center min-h-screen p-6">
+                <div className={`relative z-10 flex items-center justify-center min-h-screen p-6 transition-all duration-2000 ${
+                    isBubbleTransition ? 'opacity-0 scale-50' : 'opacity-100'
+                }`}>
                     <div className="transition-all duration-700 ease-out">
                         {/* Card container */}
                         <div className="relative">
@@ -143,7 +189,7 @@ export const WeddingMusic: React.FC = () => {
                                         src={Envelope}
                                         alt="Wedding Invitation"
                                         className={`w-full h-auto rounded-2xl transition-all duration-1000 ${
-                                            autoHover ? 'scale-110 brightness-110' : 'scale-100'
+                                            autoHover ? 'scale-115 brightness-115' : 'scale-100'
                                         }`}
                                         draggable={false}
                                     />
@@ -160,13 +206,15 @@ export const WeddingMusic: React.FC = () => {
                                     <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
                                         showText ? 'opacity-100' : 'opacity-0'
                                     }`}>
-                                        <div className={`bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-medium text-gray-700 shadow-xl transform transition-all duration-300 ${
+                                        <div className={`bg-gradient-to-r from-pink-500/95 via-rose-400/95 to-purple-500/95 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-bold text-white shadow-2xl border border-white/30 transform transition-all duration-300 ${
                                             showText ? 'scale-100 translate-y-0' : 'scale-75 translate-y-2'
                                         }`}>
-                                            <span className="flex items-center gap-2">
-                                                <span className="animate-bounce">✨</span>
-                                                {isMobile ? 'Chạm để mở thiệp' : 'Nhấn để xem thiệp'}
-                                                <span className="animate-bounce" style={{animationDelay: '0.3s'}}>💕</span>
+                                            <span className="flex items-center gap-2 drop-shadow-sm">
+                                                <span className="animate-bounce text-yellow-200">✨</span>
+                                                <span className="bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent font-extrabold">
+                                                    {isMobile ? 'Chạm để mở thiệp' : 'Nhấn để xem thiệp'}
+                                                </span>
+                                                <span className="animate-bounce text-pink-200" style={{animationDelay: '0.3s'}}>💕</span>
                                             </span>
                                         </div>
                                     </div>
@@ -209,7 +257,31 @@ export const WeddingMusic: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Auto CSS animations */}
+                {/* Bubble Transition Overlay */}
+                {isBubbleTransition && (
+                    <div className="fixed inset-0 z-50 pointer-events-none">
+                        {/* Gradient overlay for smooth transition */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-pink-100/80 via-blue-50/80 to-rose-100/80 backdrop-blur-sm animate-fade-in" />
+
+                        {/* Bubbles */}
+                        {bubbles.map((bubble) => (
+                            <div
+                                key={bubble.id}
+                                className="absolute rounded-full bg-gradient-to-br from-white/60 via-pink-100/40 to-blue-100/60 backdrop-blur-sm border border-white/30 shadow-lg"
+                                style={{
+                                    left: `${bubble.x}%`,
+                                    top: `${bubble.y}%`,
+                                    width: `${bubble.size}px`,
+                                    height: `${bubble.size}px`,
+                                    opacity: bubble.opacity,
+                                    animation: `bubbleFloat ${bubble.duration}s ease-out ${bubble.delay}s forwards, bubbleFade 1s ease-in ${bubble.delay + bubble.duration - 1}s forwards`
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Enhanced CSS animations */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
                         .continuous-shimmer {
@@ -219,6 +291,49 @@ export const WeddingMusic: React.FC = () => {
                         @keyframes shimmer {
                             0% { transform: translateX(-100%) skewX(-12deg); }
                             100% { transform: translateX(200%) skewX(-12deg); }
+                        }
+
+                        @keyframes bubbleFloatFast {
+                            0% {
+                                transform: translateY(0) scale(0.5);
+                                opacity: 0;
+                            }
+                            15% {
+                                opacity: 0.9;
+                                transform: translateY(-15px) scale(0.8);
+                            }
+                            50% {
+                                opacity: 0.8;
+                                transform: translateY(-40px) scale(1);
+                            }
+                            100% {
+                                transform: translateY(-80px) scale(1.1);
+                                opacity: 0.6;
+                            }
+                        }
+
+                        @keyframes bubbleFadeFast {
+                            0% {
+                                opacity: 0.6;
+                                transform: scale(1.1);
+                            }
+                            100% {
+                                opacity: 0;
+                                transform: scale(0.3);
+                            }
+                        }
+
+                        @keyframes fade-in-fast {
+                            0% {
+                                opacity: 0;
+                            }
+                            100% {
+                                opacity: 1;
+                            }
+                        }
+
+                        .animate-fade-in-fast {
+                            animation: fade-in-fast 0.8s ease-out forwards;
                         }
                     `
                 }} />
