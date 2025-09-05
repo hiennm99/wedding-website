@@ -15,9 +15,8 @@ export const WeddingMusic: React.FC = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadingProgress, ] = useState(0);
     const [currentlyLoading, ] = useState('');
-    const [isHovered, setIsHovered] = useState(false);
-    const [showHint, setShowHint] = useState(false);
-    const [showText, setShowText] = useState(false); // New state for text visibility
+    const [showText, setShowText] = useState(false);
+    const [autoHover, setAutoHover] = useState(false); // Auto hover effect
     const [, setParticles] = useState<Array<{
         id: number;
         x: number;
@@ -51,64 +50,48 @@ export const WeddingMusic: React.FC = () => {
 
         generateParticles();
 
-        // Auto show hint after 3 seconds on mobile
-        if (isMobile) {
-            const timer = setTimeout(() => {
-                setShowHint(true);
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-
-        // Text blinking every 1 second
+        // Auto text blinking every 1 second
         const textInterval = setInterval(() => {
             setShowText(prev => !prev);
         }, 1000);
 
+        // Auto hover effect - cycles every 3 seconds
+        const hoverInterval = setInterval(() => {
+            setAutoHover(prev => !prev);
+        }, 800);
+
+        // Auto play audio after 2 seconds
+        const audioTimer = setTimeout(() => {
+            try {
+                audioRef.current.play().catch(console.error);
+            } catch (error) {
+                console.error('Audio auto play failed:', error);
+            }
+        }, 1000);
+
         return () => {
             clearInterval(textInterval);
+            clearInterval(hoverInterval);
+            clearTimeout(audioTimer);
         };
-    }, [isMobile]);
+    }, []);
 
     const handleOpenCard = async () => {
         if (isTransitioning) return;
 
-        // Mobile: Cần user interaction để play audio
+        // Ensure audio is playing
         try {
-            if (isMobile) {
-                // Preload audio trước
-                audioRef.current.load();
-                await audioRef.current.play();
-            } else {
-                audioRef.current.play().catch(console.error);
-            }
+            await audioRef.current.play();
         } catch (error) {
             console.error('Audio play failed:', error);
         }
 
-        // Set transition state và ẩn welcome screen
         setIsTransitioning(true);
         setShowWelcome(false);
 
-        // Navigate sau khi loading xong
         setTimeout(() => {
             navigate('/home');
         }, 100);
-    };
-
-    // Mobile touch handlers
-    const handleTouchStart = () => {
-        if (isMobile) {
-            setIsHovered(true);
-        }
-    };
-
-    const handleTouchEnd = () => {
-        if (isMobile) {
-            // Delay để user có thể thấy hiệu ứng
-            setTimeout(() => {
-                setIsHovered(false);
-            }, 200);
-        }
     };
 
     // Show loading screen khi đang transition
@@ -134,7 +117,7 @@ export const WeddingMusic: React.FC = () => {
                     style={{ backgroundImage: `url(${Background})` }}
                 />
 
-                {/* Floating petals - Reduce count on mobile for performance */}
+                {/* Floating petals */}
                 <FloatingPetals count={isMobile ? 30 : 50} />
 
                 {/* Main content container */}
@@ -142,45 +125,38 @@ export const WeddingMusic: React.FC = () => {
                     <div className="transition-all duration-700 ease-out">
                         {/* Card container */}
                         <div className="relative">
-                            {/* Glow effect - Continuous pulsing - Responsive sizing */}
+                            {/* Auto pulsing glow effect */}
                             <div className="absolute inset-0 bg-gradient-to-r from-pink-400/30 to-purple-400/30 rounded-3xl blur-2xl scale-105 sm:scale-110 md:scale-115 animate-pulse"></div>
 
-                            {/* Main card */}
-                            <div className={`relative p-1 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 max-w-sm mx-auto transform transition-all duration-700 ${
-                                isHovered ? 'scale-105 shadow-3xl' : isMobile ? '' : 'hover:scale-105 hover:shadow-3xl'
+                            {/* Main card with auto scaling */}
+                            <div className={`relative p-1 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 max-w-sm mx-auto transform transition-all duration-1000 ${
+                                autoHover ? 'scale-105 shadow-3xl' : 'scale-100'
                             }`}>
 
-                                {/* Image container */}
+                                {/* Image container with auto effects */}
                                 <div
                                     className="group relative cursor-pointer overflow-hidden rounded-2xl"
                                     onClick={handleOpenCard}
-                                    onMouseEnter={() => !isMobile && setIsHovered(true)}
-                                    onMouseLeave={() => !isMobile && setIsHovered(false)}
-                                    onTouchStart={handleTouchStart}
-                                    onTouchEnd={handleTouchEnd}
-                                    // Prevent mobile scroll when touching
-                                    onTouchMove={(e) => e.preventDefault()}
                                 >
-                                    {/* Image */}
+                                    {/* Image with auto zoom effect */}
                                     <img
                                         src={Envelope}
                                         alt="Wedding Invitation"
-                                        className={`w-full h-auto rounded-2xl transition-all duration-700 ${
-                                            isHovered ? 'scale-110 brightness-110' : ''
+                                        className={`w-full h-auto rounded-2xl transition-all duration-1000 ${
+                                            autoHover ? 'scale-110 brightness-110' : 'scale-100'
                                         }`}
-                                        // Prevent drag on mobile
                                         draggable={false}
                                     />
 
-                                    {/* Hover overlay */}
-                                    <div className={`absolute inset-0 bg-gradient-to-t from-pink-600/30 via-rose-400/20 to-transparent rounded-2xl transition-all duration-500 ${
-                                        isHovered ? 'opacity-100' : 'opacity-0'
+                                    {/* Auto overlay effect */}
+                                    <div className={`absolute inset-0 bg-gradient-to-t from-pink-600/30 via-rose-400/20 to-transparent rounded-2xl transition-all duration-1000 ${
+                                        autoHover ? 'opacity-100' : 'opacity-0'
                                     }`}></div>
 
-                                    {/* Continuous shimmer effect */}
+                                    {/* Continuous shimmer effect - always active */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 rounded-2xl continuous-shimmer"></div>
 
-                                    {/* Click hint - Appears rhythmically every 1 second */}
+                                    {/* Auto text animation */}
                                     <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
                                         showText ? 'opacity-100' : 'opacity-0'
                                     }`}>
@@ -195,7 +171,7 @@ export const WeddingMusic: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Continuous floating light effects - Always visible and continuously sparkling */}
+                                    {/* Continuous floating light effects - always sparkling */}
                                     <>
                                         <div className="absolute top-6 left-6 w-3 h-3 bg-white rounded-full animate-ping shadow-lg"></div>
                                         <div className="absolute top-12 right-8 w-2 h-2 bg-pink-200 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.5s'}}></div>
@@ -205,7 +181,7 @@ export const WeddingMusic: React.FC = () => {
                                         <div className="absolute top-1/3 right-4 w-2 h-2 bg-pink-200 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.8s'}}></div>
                                     </>
 
-                                    {/* Continuous magical particles - Always sparkling */}
+                                    {/* Continuous magical particles - always sparkling */}
                                     <>
                                         {[...Array(isMobile ? 15 : 8)].map((_, i) => (
                                             <div
@@ -223,12 +199,29 @@ export const WeddingMusic: React.FC = () => {
                                             />
                                         ))}
                                     </>
+
+                                    {/* Additional auto breathing effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-pink-300/10 to-purple-300/10 rounded-2xl animate-pulse"></div>
                                 </div>
 
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Auto CSS animations */}
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                        .continuous-shimmer {
+                            animation: shimmer 3s infinite linear;
+                        }
+                        
+                        @keyframes shimmer {
+                            0% { transform: translateX(-100%) skewX(-12deg); }
+                            100% { transform: translateX(200%) skewX(-12deg); }
+                        }
+                    `
+                }} />
             </div>
         );
     }
