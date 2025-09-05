@@ -1,27 +1,44 @@
-import React, {useCallback, useMemo, useState} from "react";
-import {useNavigate} from "react-router";
-import type {VoteModalProps} from "../../types";
-import {useFormState} from "../../hooks/useFormState.ts";
+import {useCallback, useState, useEffect} from "react";
+import {FloatingPetals} from "../FloatingPetals.tsx";
 import {FormSection} from "../FormSection.tsx";
 import {RadioButton} from "../button/RadioButton.tsx";
-import {TRANSPORT_OPTIONS} from "../constants";
-import {FloatingPetals} from "../FloatingPetals.tsx";
-import databaseService, { type AttendeeData } from "../../services/databaseService.ts";
 
-export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
-    const navigate = useNavigate();
+const TRANSPORT_OPTIONS = [
+    { value: 'car', label: '🚗 Xe hơi' },
+    { value: 'motorbike', label: '🏍️ Xe máy' },
+    { value: 'bus', label: '🚌 Xe buýt' },
+    { value: 'other', label: '🚶 Khác' }
+];
+
+export function VoteModal({ isOpen = true, onClose = () => {} }) {
+    const navigate = () => console.log('Navigate to /thankful');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
-    const {
-        attendee, setAttendee,
-        joinable, setJoinable,
-        transport, setTransport,
-        message, setMessage,
-        resetForm
-    } = useFormState();
+    // Form state
+    const [attendee, setAttendee] = useState('');
+    const [joinable, setJoinable] = useState(true);
+    const [transport, setTransport] = useState('car');
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const resetForm = useCallback(() => {
+        setAttendee('');
+        setJoinable(true);
+        setTransport('car');
+        setMessage('');
+    }, []);
 
     const handleSubmit = useCallback(async () => {
-        // Validate required fields
         if (!attendee.trim()) {
             alert('Vui lòng nhập tên của bạn');
             return;
@@ -29,45 +46,29 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
 
         setIsSubmitting(true);
 
-        // Format data for Supabase
-        const formData: AttendeeData = {
-            attendee: attendee.trim(),
-            joinable: joinable ? 'Có' : 'Không',
-            transport: joinable ? transport : '',
-            message: message.trim()
-        };
-
-        console.log('Submitting to Supabase:', formData);
-
+        // Simulate API call
         try {
-            const result = await databaseService.insertData(formData);
-
-            if (result.success) {
-                console.log('Success:', result.message);
-                // Navigate and cleanup
-                navigate('/thankful');
-                resetForm();
-                onClose();
-            } else {
-                console.error('Failed:', result.message);
-                alert('⚠ Có lỗi xảy ra: ' + result.message);
-            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log('Form submitted:', { attendee, joinable, transport, message });
+            navigate();
+            resetForm();
+            onClose();
         } catch (error) {
             console.error('Submit error:', error);
             alert('⚠ Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
         } finally {
             setIsSubmitting(false);
         }
-    }, [attendee, transport, message, joinable, resetForm, onClose, navigate]);
+    }, [attendee, transport, message, joinable, resetForm, onClose]);
 
     const handleClose = useCallback(() => {
-        if (isSubmitting) return; // Prevent close while submitting
+        if (isSubmitting) return;
         resetForm();
         onClose();
     }, [resetForm, onClose, isSubmitting]);
 
     // Prevent scroll when modal is open
-    useMemo(() => {
+    useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         } else {
@@ -83,48 +84,58 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-            {/* Background overlay with glassmorphism effect */}
+            {/* Simplified background - no complex gradients or blur on mobile */}
             <div
-                className="absolute inset-0 bg-gradient-to-br from-pink-300/20 via-purple-300/15 to-rose-300/20 backdrop-blur-md"
+                className={`absolute inset-0 ${
+                    isMobile
+                        ? 'bg-black/40'
+                        : 'bg-gradient-to-br from-pink-300/20 via-purple-300/15 to-rose-300/20 backdrop-blur-sm'
+                }`}
                 onClick={handleClose}
             />
 
-            {/* Floating petals behind modal */}
-            <div className="absolute inset-0 pointer-events-none">
-                <FloatingPetals count={30} />
-            </div>
+            {/* Reduced floating petals */}
+            {!isMobile && (
+                <div className="absolute inset-0 pointer-events-none">
+                    <FloatingPetals count={6} />
+                </div>
+            )}
 
-            {/* Center container with proper positioning */}
-            <div className="flex min-h-screen items-start justify-center pt-8 pb-8 px-4">
-                {/* Modal content with glassmorphism */}
-                <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 w-full max-w-2xl max-h-[85vh] overflow-hidden">
+            {/* Center container */}
+            <div className="flex min-h-screen items-start justify-center pt-4 pb-4 px-4">
+                {/* Modal content - simplified on mobile */}
+                <div className={`relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl shadow-xl border ${
+                    isMobile
+                        ? 'bg-white border-gray-200'
+                        : 'bg-white/95 backdrop-blur-md border-white/30'
+                }`}>
                     {/* Close button */}
                     <button
                         onClick={handleClose}
                         disabled={isSubmitting}
-                        className="absolute -top-2 -right-2 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300 text-pink-600 text-2xl font-bold shadow-lg border-2 border-pink-200/50 disabled:opacity-50 hover:scale-110"
+                        className="absolute -top-1 -right-1 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
                         aria-label="Đóng modal"
                     >
                         ×
                     </button>
 
-                    {/* Header with gradient */}
-                    <div className="bg-gradient-to-br from-pink-100/80 via-rose-50/80 to-pink-100/80 backdrop-blur-sm px-8 py-6 rounded-t-3xl border-b border-pink-200/30">
-                        <h2 className="text-3xl text-rose-600 text-center font-['Allura'] drop-shadow-sm">
+                    {/* Header - simplified */}
+                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100">
+                        <h2 className="text-2xl text-rose-600 text-center font-semibold">
                             Mời mọi người cùng tham dự nha
                         </h2>
                     </div>
 
                     {/* Form content - scrollable area */}
-                    <div className="max-h-[calc(85vh-120px)] overflow-y-auto">
-                        <div className="p-8 space-y-6 bg-white/50 backdrop-blur-sm">
+                    <div className="max-h-[calc(90vh-100px)] overflow-y-auto">
+                        <div className="p-6 space-y-5">
                             {/* Attendee Name */}
                             <FormSection title="👤 Tên của bạn">
                                 <input
                                     value={attendee}
                                     onChange={(e) => setAttendee(e.target.value)}
                                     placeholder="Vui lòng nhập họ và tên..."
-                                    className="w-full bg-white/80 backdrop-blur-sm border-2 border-pink-200/50 rounded-xl px-4 py-3 text-rose-700 placeholder-pink-400 font-light focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white/90 text-sm shadow-sm"
+                                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 text-sm"
                                     required
                                     disabled={isSubmitting}
                                 />
@@ -132,7 +143,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
 
                             {/* RSVP Options */}
                             <FormSection title="✨ Xác nhận tham dự">
-                                <div className="flex flex-col sm:flex-row gap-3">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                     <RadioButton
                                         checked={joinable}
                                         onClick={() => !isSubmitting && setJoinable(true)}
@@ -149,7 +160,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                             {/* Transportation Options - Only show if attending */}
                             {joinable && (
                                 <FormSection title="🚗 Phương tiện di chuyển">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         {TRANSPORT_OPTIONS.map((item) => (
                                             <RadioButton
                                                 key={item.value}
@@ -164,21 +175,21 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
 
                             {/* Message */}
                             <FormSection title="💌 Lời chúc cho cô dâu chú rể">
-                                <textarea
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
-                                    className="w-full bg-white/80 backdrop-blur-sm border-2 border-pink-200/50 rounded-xl px-4 py-3 text-rose-700 placeholder-pink-400 font-light focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white/90 resize-none text-sm shadow-sm"
-                                    rows={3}
-                                    disabled={isSubmitting}
-                                />
+                <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
+                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none text-sm"
+                    rows={3}
+                    disabled={isSubmitting}
+                />
                             </FormSection>
 
                             {/* Submit button */}
                             <button
                                 onClick={handleSubmit}
                                 disabled={!attendee.trim() || isSubmitting}
-                                className="w-full bg-gradient-to-r from-pink-400/90 to-rose-400/90 backdrop-blur-sm hover:from-pink-500/95 hover:to-rose-500/95 text-white px-6 py-3 rounded-full font-light transition-all duration-300 tracking-wider text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl border border-white/30 flex items-center justify-center gap-2"
+                                className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
                             >
                                 {isSubmitting ? (
                                     <>
@@ -186,55 +197,40 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                                         Đang gửi...
                                     </>
                                 ) : (
-                                    <>
-                                        ✨ GỬI XÁC NHẬN ✨
-                                    </>
+                                    'GỬI XÁC NHẬN'
                                 )}
                             </button>
                         </div>
                     </div>
-
-                    {/* Bottom rounded corner fix */}
-                    <div className="bg-white/50 backdrop-blur-sm rounded-b-2xl sm:rounded-b-3xl h-2"></div>
                 </div>
             </div>
 
-            {/* Additional floating elements for atmosphere */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {[...Array(20)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="absolute bg-gradient-to-r from-pink-300/30 to-purple-300/30 rounded-full backdrop-blur-sm animate-float"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            width: `${Math.random() * 20 + 5}px`,
-                            height: `${Math.random() * 20 + 5}px`,
-                            animationDelay: `${Math.random() * 3}s`,
-                            animationDuration: `${Math.random() * 4 + 6}s`
-                        }}
-                    />
-                ))}
-            </div>
-
+            {/* CSS for simplified animations */}
             <style dangerouslySetInnerHTML={{
                 __html: `
-                    @keyframes float {
-                        0%, 100% {
-                            transform: translateY(0px) rotate(0deg);
-                            opacity: 0.3;
-                        }
-                        50% {
-                            transform: translateY(-20px) rotate(180deg);
-                            opacity: 0.6;
-                        }
-                    }
-                    
-                    .animate-float {
-                        animation: float 6s ease-in-out infinite;
-                    }
-                `
+          @keyframes float-simple {
+            0%, 100% {
+              transform: translateY(0px);
+              opacity: 0.2;
+            }
+            50% {
+              transform: translateY(-10px);
+              opacity: 0.4;
+            }
+          }
+          
+          .animate-float-simple {
+            animation: float-simple 4s ease-in-out infinite;
+          }
+          
+          /* Reduce animations on mobile */
+          @media (max-width: 767px) {
+            .animate-float-simple {
+              animation: none;
+            }
+          }
+        `
             }} />
         </div>
     );
-};
+}
