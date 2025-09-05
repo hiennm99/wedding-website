@@ -16,7 +16,8 @@ export const WeddingMusic: React.FC = () => {
     const [loadingProgress, ] = useState(0);
     const [currentlyLoading, ] = useState('');
     const [isHovered, setIsHovered] = useState(false);
-    const [showHint, setShowHint] = useState(false); // Thêm setter
+    const [, setShowHint] = useState(false);
+    const [showText, setShowText] = useState(false); // New state for text visibility
     const [, setParticles] = useState<Array<{
         id: number;
         x: number;
@@ -57,6 +58,15 @@ export const WeddingMusic: React.FC = () => {
             }, 3000);
             return () => clearTimeout(timer);
         }
+
+        // Text blinking every 1 second
+        const textInterval = setInterval(() => {
+            setShowText(prev => !prev);
+        }, 1000);
+
+        return () => {
+            clearInterval(textInterval);
+        };
     }, [isMobile]);
 
     const handleOpenCard = async () => {
@@ -132,14 +142,12 @@ export const WeddingMusic: React.FC = () => {
                     <div className="transition-all duration-700 ease-out">
                         {/* Card container */}
                         <div className="relative">
-                            {/* Glow effect - More prominent on mobile */}
-                            <div className={`absolute inset-0 bg-gradient-to-r from-pink-400/30 to-purple-400/30 rounded-3xl blur-2xl scale-105 transition-all duration-500 ${
-                                isHovered || showHint ? 'animate-pulse scale-110 from-pink-500/50 to-purple-500/50' : 'animate-pulse'
-                            }`}></div>
+                            {/* Glow effect - Continuous pulsing - Responsive sizing */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-pink-400/30 to-purple-400/30 rounded-3xl blur-2xl scale-105 sm:scale-110 md:scale-115 animate-pulse"></div>
 
                             {/* Main card */}
                             <div className={`relative p-1 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 max-w-sm mx-auto transform transition-all duration-700 ${
-                                isHovered || showHint ? 'scale-105 shadow-3xl' : isMobile ? '' : 'hover:scale-105 hover:shadow-3xl'
+                                isHovered ? 'scale-105 shadow-3xl' : isMobile ? '' : 'hover:scale-105 hover:shadow-3xl'
                             }`}>
 
                                 {/* Image container */}
@@ -158,7 +166,7 @@ export const WeddingMusic: React.FC = () => {
                                         src={Envelope}
                                         alt="Wedding Invitation"
                                         className={`w-full h-auto rounded-2xl transition-all duration-700 ${
-                                            isHovered || showHint ? 'scale-110 brightness-110' : ''
+                                            isHovered ? 'scale-110 brightness-110' : ''
                                         }`}
                                         // Prevent drag on mobile
                                         draggable={false}
@@ -166,61 +174,55 @@ export const WeddingMusic: React.FC = () => {
 
                                     {/* Hover overlay */}
                                     <div className={`absolute inset-0 bg-gradient-to-t from-pink-600/30 via-rose-400/20 to-transparent rounded-2xl transition-all duration-500 ${
-                                        isHovered || showHint ? 'opacity-100' : 'opacity-0'
+                                        isHovered ? 'opacity-100' : 'opacity-0'
                                     }`}></div>
 
-                                    {/* Shimmer effect */}
-                                    <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 rounded-2xl transition-transform duration-1000 ${
-                                        isHovered || showHint ? 'translate-x-full' : '-translate-x-full'
-                                    }`}></div>
+                                    {/* Continuous shimmer effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 rounded-2xl continuous-shimmer"></div>
 
-                                    {/* Click hint - Always visible on mobile after delay */}
+                                    {/* Click hint - Appears rhythmically every 1 second */}
                                     <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-                                        isHovered || showHint || (isMobile && showHint) ? 'opacity-100' : 'opacity-0'
+                                        showText ? 'opacity-100' : 'opacity-0'
                                     }`}>
                                         <div className={`bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-medium text-gray-700 shadow-xl transform transition-all duration-300 ${
-                                            isHovered || showHint || (isMobile && showHint) ? 'scale-100 translate-y-0' : 'scale-75 translate-y-2'
+                                            showText ? 'scale-100 translate-y-0' : 'scale-75 translate-y-2'
                                         }`}>
                                             <span className="flex items-center gap-2">
-                                                <span className={`${showHint || (isMobile && showHint) ? 'animate-bounce' : ''}`}>✨</span>
+                                                <span className="animate-bounce">✨</span>
                                                 {isMobile ? 'Chạm để mở thiệp' : 'Nhấn để xem thiệp'}
-                                                <span className={`${showHint || (isMobile && showHint) ? 'animate-bounce' : ''}`} style={{animationDelay: '0.3s'}}>💕</span>
+                                                <span className="animate-bounce" style={{animationDelay: '0.3s'}}>💕</span>
                                             </span>
                                         </div>
                                     </div>
 
-                                    {/* Floating light effects */}
-                                    {(isHovered || showHint || (isMobile && showHint)) && (
-                                        <>
-                                            <div className="absolute top-6 left-6 w-3 h-3 bg-white rounded-full animate-ping shadow-lg"></div>
-                                            <div className="absolute top-12 right-8 w-2 h-2 bg-pink-200 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.5s'}}></div>
-                                            <div className="absolute bottom-8 left-12 w-2.5 h-2.5 bg-white rounded-full animate-ping shadow-lg" style={{animationDelay: '1s'}}></div>
-                                            <div className="absolute bottom-6 right-6 w-3 h-3 bg-pink-100 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.7s'}}></div>
-                                            <div className="absolute top-1/2 left-4 w-1.5 h-1.5 bg-white rounded-full animate-ping shadow-lg" style={{animationDelay: '0.3s'}}></div>
-                                            <div className="absolute top-1/3 right-4 w-2 h-2 bg-pink-200 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.8s'}}></div>
-                                        </>
-                                    )}
+                                    {/* Continuous floating light effects - Always visible and continuously sparkling */}
+                                    <>
+                                        <div className="absolute top-6 left-6 w-3 h-3 bg-white rounded-full animate-ping shadow-lg"></div>
+                                        <div className="absolute top-12 right-8 w-2 h-2 bg-pink-200 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.5s'}}></div>
+                                        <div className="absolute bottom-8 left-12 w-2.5 h-2.5 bg-white rounded-full animate-ping shadow-lg" style={{animationDelay: '1s'}}></div>
+                                        <div className="absolute bottom-6 right-6 w-3 h-3 bg-pink-100 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.7s'}}></div>
+                                        <div className="absolute top-1/2 left-4 w-1.5 h-1.5 bg-white rounded-full animate-ping shadow-lg" style={{animationDelay: '0.3s'}}></div>
+                                        <div className="absolute top-1/3 right-4 w-2 h-2 bg-pink-200 rounded-full animate-ping shadow-lg" style={{animationDelay: '0.8s'}}></div>
+                                    </>
 
-                                    {/* Extra magical particles */}
-                                    {(showHint || (isMobile && showHint)) && (
-                                        <>
-                                            {[...Array(isMobile ? 15 : 8)].map((_, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="absolute bg-white rounded-full shadow-lg animate-ping"
-                                                    style={{
-                                                        top: `${20 + Math.random() * 60}%`,
-                                                        left: `${10 + Math.random() * 80}%`,
-                                                        width: `${Math.random() * (isMobile ? 12 : 8) + (isMobile ? 8 : 4)}px`,
-                                                        height: `${Math.random() * (isMobile ? 12 : 8) + (isMobile ? 8 : 4)}px`,
-                                                        animationDelay: `${Math.random() * 1.5}s`,
-                                                        opacity: isMobile ? 0.9 : 0.7,
-                                                        animationDuration: isMobile ? '1s' : '1.5s'
-                                                    }}
-                                                />
-                                            ))}
-                                        </>
-                                    )}
+                                    {/* Continuous magical particles - Always sparkling */}
+                                    <>
+                                        {[...Array(isMobile ? 15 : 8)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="absolute bg-white rounded-full shadow-lg animate-ping"
+                                                style={{
+                                                    top: `${20 + Math.random() * 60}%`,
+                                                    left: `${10 + Math.random() * 80}%`,
+                                                    width: `${Math.random() * (isMobile ? 12 : 8) + (isMobile ? 8 : 4)}px`,
+                                                    height: `${Math.random() * (isMobile ? 12 : 8) + (isMobile ? 8 : 4)}px`,
+                                                    animationDelay: `${Math.random() * 2}s`,
+                                                    opacity: isMobile ? 0.9 : 0.7,
+                                                    animationDuration: isMobile ? '1s' : '1.5s'
+                                                }}
+                                            />
+                                        ))}
+                                    </>
                                 </div>
 
                             </div>
