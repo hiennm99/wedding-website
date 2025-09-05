@@ -16,7 +16,7 @@ export const WeddingMusic: React.FC = () => {
     const [loadingProgress, ] = useState(0);
     const [currentlyLoading, ] = useState('');
     const [isHovered, setIsHovered] = useState(false);
-    const [, setShowHint] = useState(false);
+    const [showHint, setShowHint] = useState(false);
     const [showText, setShowText] = useState(false); // New state for text visibility
     const [, setParticles] = useState<Array<{
         id: number;
