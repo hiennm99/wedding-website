@@ -65,12 +65,12 @@ export const WeddingMusic: React.FC = () => {
         // Auto text blinking every 1 second
         const textInterval = setInterval(() => {
             setShowText(prev => !prev);
-        }, 1000);
+        }, 1500);
 
         // Auto hover effect - cycles every 2 seconds
         const hoverInterval = setInterval(() => {
             setAutoHover(prev => !prev);
-        }, 2000);
+        }, 1500);
 
         // Auto play audio after 2 seconds
         const audioTimer = setTimeout(() => {
