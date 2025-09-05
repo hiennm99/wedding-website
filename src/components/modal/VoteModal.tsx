@@ -195,7 +195,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Bottom rounded corner fix */}
-                    <div className="bg-white/50 backdrop-blur-sm rounded-b-3xl h-2"></div>
+                    <div className="bg-white/50 backdrop-blur-sm rounded-b-2xl sm:rounded-b-3xl h-2"></div>
                 </div>
             </div>
 
