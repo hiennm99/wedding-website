@@ -6,7 +6,7 @@ import {
     Navigate
 } from "react-router";
 import WeddingInvitation from "./components/WeddingInvitation.tsx";
-import WeddingMusic from "./components/WeddingMusic.tsx";
+import WeddingEnvelope from "./components/WeddingEnvelope.tsx";
 import {Thankful} from "./components/Thankful.tsx";
 import {useAssetPreloader} from "./hooks/useAssetPreloader.ts";
 import {LoadingScreen} from "./components/LoadingScreen.tsx";
@@ -62,7 +62,7 @@ const WeddingMusicWithTracking: React.FC = () => {
         setHasVisitedHome(true);
     }, [setHasVisitedHome]);
 
-    return <WeddingMusic />;
+    return <WeddingEnvelope />;
 };
 
 const AppRoutes: React.FC = () => {

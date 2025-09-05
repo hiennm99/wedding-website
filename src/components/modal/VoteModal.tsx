@@ -94,15 +94,15 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                 <FloatingPetals count={30} />
             </div>
 
-            {/* Flexbox container for centering */}
-            <div className="flex min-h-full items-center justify-center p-4">
+            {/* Center container with proper positioning */}
+            <div className="flex min-h-screen items-start justify-center pt-8 pb-8 px-4">
                 {/* Modal content with glassmorphism */}
-                <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 max-w-2xl w-full max-h-[85vh] overflow-hidden">
+                <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 w-full max-w-2xl max-h-[85vh] overflow-hidden">
                     {/* Close button */}
                     <button
                         onClick={handleClose}
                         disabled={isSubmitting}
-                        className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-all duration-300 text-pink-600 text-xl font-bold shadow-lg border border-pink-200/50 disabled:opacity-50"
+                        className="absolute -top-2 -right-2 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300 text-pink-600 text-2xl font-bold shadow-lg border-2 border-pink-200/50 disabled:opacity-50 hover:scale-110"
                         aria-label="Đóng modal"
                     >
                         ×
@@ -116,7 +116,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Form content - scrollable area */}
-                    <div className="max-h-[60vh] overflow-y-auto">
+                    <div className="max-h-[calc(85vh-120px)] overflow-y-auto">
                         <div className="p-8 space-y-6 bg-white/50 backdrop-blur-sm">
                             {/* Attendee Name */}
                             <FormSection title="👤 Tên của bạn">

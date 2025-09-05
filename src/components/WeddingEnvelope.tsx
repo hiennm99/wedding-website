@@ -18,7 +18,7 @@ interface Bubble {
     opacity: number;
 }
 
-export const WeddingMusic: React.FC = () => {
+export const WeddingEnvelope: React.FC = () => {
     const isMobile = detectMobile();
     const navigate = useNavigate();
     const [showWelcome, setShowWelcome] = useState(true);
@@ -344,4 +344,4 @@ export const WeddingMusic: React.FC = () => {
     return null;
 };
 
-export default WeddingMusic;
+export default WeddingEnvelope;
