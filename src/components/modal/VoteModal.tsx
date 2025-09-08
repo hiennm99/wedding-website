@@ -67,35 +67,30 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
         onClose();
     }, [resetForm, onClose, isSubmitting]);
 
-    // Prevent background scroll when modal is open
+    // Prevent background scroll - SIMPLIFIED VERSION
     useEffect(() => {
         if (isOpen) {
-            // Store current scroll position
-            const scrollY = window.scrollY;
-
-            // Prevent background scroll
+            // Simple approach - just prevent body scroll
+            const originalStyle = window.getComputedStyle(document.body).overflow;
             document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollY}px`;
-            document.body.style.width = '100%';
-            document.documentElement.style.overflow = 'hidden';
 
             return () => {
-                // Restore scroll position when modal closes
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.width = '';
-                document.documentElement.style.overflow = '';
-                window.scrollTo(0, scrollY);
+                document.body.style.overflow = originalStyle;
             };
         }
     }, [isOpen]);
 
+    // Handle backdrop click
+    const handleBackdropClick = useCallback((e) => {
+        if (e.target === e.currentTarget) {
+            handleClose();
+        }
+    }, [handleClose]);
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Background overlay */}
             <div
                 className={`absolute inset-0 ${
@@ -103,7 +98,7 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                         ? 'bg-black/50'
                         : 'bg-gradient-to-br from-pink-300/20 via-purple-300/15 to-rose-300/20 backdrop-blur-sm'
                 }`}
-                onClick={handleClose}
+                onClick={handleBackdropClick}
             />
 
             {/* Floating petals - only on desktop */}
@@ -113,33 +108,33 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                 </div>
             )}
 
-            {/* Modal container with its own scroll */}
-            <div className="absolute inset-0 flex items-start justify-center p-4 overflow-y-auto">
-                <div className="w-full max-w-2xl my-auto">
-                    {/* Modal content */}
-                    <div className={`relative w-full rounded-2xl shadow-xl border ${
-                        isMobile
-                            ? 'bg-white border-gray-200'
-                            : 'bg-white/95 backdrop-blur-md border-white/30'
-                    }`}>
-                        {/* Close button */}
-                        <button
-                            onClick={handleClose}
-                            disabled={isSubmitting}
-                            className="absolute -top-2 -right-2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
-                            aria-label="Đóng modal"
-                        >
-                            ×
-                        </button>
+            {/* Modal content with its own scroll */}
+            <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col">
+                {/* Modal container */}
+                <div className={`relative bg-white rounded-2xl shadow-xl border overflow-hidden ${
+                    isMobile
+                        ? 'border-gray-200'
+                        : 'bg-white/95 backdrop-blur-md border-white/30'
+                }`}>
+                    {/* Close button */}
+                    <button
+                        onClick={handleClose}
+                        disabled={isSubmitting}
+                        className="absolute -top-2 -right-2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
+                        aria-label="Đóng modal"
+                    >
+                        ×
+                    </button>
 
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100 rounded-t-2xl">
-                            <h2 className="text-2xl text-rose-600 text-center font-semibold">
-                                Mời mọi người cùng tham dự nha
-                            </h2>
-                        </div>
+                    {/* Header - FIXED */}
+                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100">
+                        <h2 className="text-2xl text-rose-600 text-center font-semibold">
+                            Mời mọi người cùng tham dự nha
+                        </h2>
+                    </div>
 
-                        {/* Form content */}
+                    {/* Form content - SCROLLABLE */}
+                    <div className="overflow-y-auto max-h-[calc(90vh-100px)] custom-scroll">
                         <div className="p-6 space-y-5">
                             {/* Attendee Name */}
                             <FormSection title="👤 Tên của bạn">
@@ -217,7 +212,7 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                 </div>
             </div>
 
-            {/* CSS for animations */}
+            {/* CSS for animations and scrollbar */}
             <style dangerouslySetInnerHTML={{
                 __html: `
                     @keyframes float-simple {
@@ -235,38 +230,29 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                         animation: float-simple 4s ease-in-out infinite;
                     }
                     
-                    /* Reduce animations on mobile */
-                    @media (max-width: 767px) {
-                        .animate-float-simple {
-                            animation: none;
-                        }
-                    }
-
-                    /* Custom scrollbar for modal */
-                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar {
+                    /* Custom scrollbar */
+                    .custom-scroll::-webkit-scrollbar {
                         width: 6px;
                     }
                     
-                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar-track {
+                    .custom-scroll::-webkit-scrollbar-track {
                         background: rgba(255, 192, 203, 0.1);
                         border-radius: 3px;
                     }
                     
-                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar-thumb {
+                    .custom-scroll::-webkit-scrollbar-thumb {
                         background: rgba(219, 39, 119, 0.3);
                         border-radius: 3px;
                     }
                     
-                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+                    .custom-scroll::-webkit-scrollbar-thumb:hover {
                         background: rgba(219, 39, 119, 0.5);
                     }
-
-                    /* Ensure modal can scroll on mobile */
-                    @media (max-height: 640px) {
-                        .flex.min-h-full.items-center {
-                            align-items: flex-start;
-                            padding-top: 2rem;
-                            padding-bottom: 2rem;
+                    
+                    /* Reduce animations on mobile */
+                    @media (max-width: 767px) {
+                        .animate-float-simple {
+                            animation: none;
                         }
                     }
                 `
