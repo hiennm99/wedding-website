@@ -10,6 +10,7 @@ import WeddingEnvelope from "./components/WeddingEnvelope.tsx";
 import {Thankful} from "./components/Thankful.tsx";
 import {useAssetPreloader} from "./hooks/useAssetPreloader.ts";
 import {LoadingScreen} from "./components/LoadingScreen.tsx";
+import {WeddingVote} from "./components/WeddingVote.tsx";
 
 // Navigation Context
 interface NavigationContextType {
@@ -102,6 +103,14 @@ const AppRoutes: React.FC = () => {
                     element={
                         <ProtectedRoute>
                             <WeddingInvitation />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/vote"
+                    element={
+                        <ProtectedRoute>
+                            <WeddingVote />
                         </ProtectedRoute>
                     }
                 />

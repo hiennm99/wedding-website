@@ -20,6 +20,7 @@ export interface RadioButtonProps {
     checked: boolean;
     onClick: () => void;
     label: string;
+    disabled?: boolean; // Thêm prop này
 }
 
 export interface FormSectionProps {

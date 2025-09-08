@@ -67,74 +67,67 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
         onClose();
     }, [resetForm, onClose, isSubmitting]);
 
-    // Prevent background scroll - SIMPLIFIED VERSION
+    // Prevent scroll when modal is open
     useEffect(() => {
         if (isOpen) {
-            // Simple approach - just prevent body scroll
-            const originalStyle = window.getComputedStyle(document.body).overflow;
             document.body.style.overflow = 'hidden';
-
-            return () => {
-                document.body.style.overflow = originalStyle;
-            };
+        } else {
+            document.body.style.overflow = 'auto';
         }
+
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
     }, [isOpen]);
-
-    // Handle backdrop click
-    const handleBackdropClick = useCallback((e) => {
-        if (e.target === e.currentTarget) {
-            handleClose();
-        }
-    }, [handleClose]);
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Background overlay */}
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+            {/* Simplified background - no complex gradients or blur on mobile */}
             <div
                 className={`absolute inset-0 ${
                     isMobile
-                        ? 'bg-black/50'
+                        ? 'bg-black/40'
                         : 'bg-gradient-to-br from-pink-300/20 via-purple-300/15 to-rose-300/20 backdrop-blur-sm'
                 }`}
-                onClick={handleBackdropClick}
+                onClick={handleClose}
             />
 
-            {/* Floating petals - only on desktop */}
+            {/* Reduced floating petals */}
             {!isMobile && (
                 <div className="absolute inset-0 pointer-events-none">
                     <FloatingPetals count={6} />
                 </div>
             )}
 
-            {/* Modal content with its own scroll */}
-            <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col">
-                {/* Modal container */}
-                <div className={`relative bg-white rounded-2xl shadow-xl border overflow-hidden ${
+            {/* Center container */}
+            <div className="flex min-h-screen items-start justify-center pt-4 pb-4 px-4">
+                {/* Modal content - simplified on mobile */}
+                <div className={`relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl shadow-xl border ${
                     isMobile
-                        ? 'border-gray-200'
+                        ? 'bg-white border-gray-200'
                         : 'bg-white/95 backdrop-blur-md border-white/30'
                 }`}>
                     {/* Close button */}
                     <button
                         onClick={handleClose}
                         disabled={isSubmitting}
-                        className="absolute -top-2 -right-2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
+                        className="absolute -top-1 -right-1 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
                         aria-label="Đóng modal"
                     >
                         ×
                     </button>
 
-                    {/* Header - FIXED */}
+                    {/* Header - simplified */}
                     <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100">
                         <h2 className="text-2xl text-rose-600 text-center font-semibold">
                             Mời mọi người cùng tham dự nha
                         </h2>
                     </div>
 
-                    {/* Form content - SCROLLABLE */}
-                    <div className="overflow-y-auto max-h-[calc(90vh-100px)] custom-scroll">
+                    {/* Form content - scrollable area */}
+                    <div className="max-h-[calc(90vh-100px)] overflow-y-auto">
                         <div className="p-6 space-y-5">
                             {/* Attendee Name */}
                             <FormSection title="👤 Tên của bạn">
@@ -182,14 +175,14 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
 
                             {/* Message */}
                             <FormSection title="💌 Lời chúc cho cô dâu chú rể">
-                                <textarea
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
-                                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none text-sm"
-                                    rows={3}
-                                    disabled={isSubmitting}
-                                />
+                <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
+                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none text-sm"
+                    rows={3}
+                    disabled={isSubmitting}
+                />
                             </FormSection>
 
                             {/* Submit button */}
@@ -212,50 +205,31 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                 </div>
             </div>
 
-            {/* CSS for animations and scrollbar */}
+            {/* CSS for simplified animations */}
             <style dangerouslySetInnerHTML={{
                 __html: `
-                    @keyframes float-simple {
-                        0%, 100% {
-                            transform: translateY(0px);
-                            opacity: 0.2;
-                        }
-                        50% {
-                            transform: translateY(-10px);
-                            opacity: 0.4;
-                        }
-                    }
-                    
-                    .animate-float-simple {
-                        animation: float-simple 4s ease-in-out infinite;
-                    }
-                    
-                    /* Custom scrollbar */
-                    .custom-scroll::-webkit-scrollbar {
-                        width: 6px;
-                    }
-                    
-                    .custom-scroll::-webkit-scrollbar-track {
-                        background: rgba(255, 192, 203, 0.1);
-                        border-radius: 3px;
-                    }
-                    
-                    .custom-scroll::-webkit-scrollbar-thumb {
-                        background: rgba(219, 39, 119, 0.3);
-                        border-radius: 3px;
-                    }
-                    
-                    .custom-scroll::-webkit-scrollbar-thumb:hover {
-                        background: rgba(219, 39, 119, 0.5);
-                    }
-                    
-                    /* Reduce animations on mobile */
-                    @media (max-width: 767px) {
-                        .animate-float-simple {
-                            animation: none;
-                        }
-                    }
-                `
+          @keyframes float-simple {
+            0%, 100% {
+              transform: translateY(0px);
+              opacity: 0.2;
+            }
+            50% {
+              transform: translateY(-10px);
+              opacity: 0.4;
+            }
+          }
+          
+          .animate-float-simple {
+            animation: float-simple 4s ease-in-out infinite;
+          }
+          
+          /* Reduce animations on mobile */
+          @media (max-width: 767px) {
+            .animate-float-simple {
+              animation: none;
+            }
+          }
+        `
             }} />
         </div>
     );
