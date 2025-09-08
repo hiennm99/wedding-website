@@ -243,22 +243,31 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                     }
 
                     /* Custom scrollbar for modal */
-                    .modal-scroll::-webkit-scrollbar {
+                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar {
                         width: 6px;
                     }
                     
-                    .modal-scroll::-webkit-scrollbar-track {
+                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar-track {
                         background: rgba(255, 192, 203, 0.1);
                         border-radius: 3px;
                     }
                     
-                    .modal-scroll::-webkit-scrollbar-thumb {
+                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar-thumb {
                         background: rgba(219, 39, 119, 0.3);
                         border-radius: 3px;
                     }
                     
-                    .modal-scroll::-webkit-scrollbar-thumb:hover {
+                    .absolute.inset-0.overflow-y-auto::-webkit-scrollbar-thumb:hover {
                         background: rgba(219, 39, 119, 0.5);
+                    }
+
+                    /* Ensure modal can scroll on mobile */
+                    @media (max-height: 640px) {
+                        .flex.min-h-full.items-center {
+                            align-items: flex-start;
+                            padding-top: 2rem;
+                            padding-bottom: 2rem;
+                        }
                     }
                 `
             }} />
