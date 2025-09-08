@@ -4,6 +4,7 @@ import {FloatingPetals} from "./FloatingPetals.tsx";
 import {RadioButton} from "./button/RadioButton.tsx";
 import {FormSection} from "./FormSection.tsx";
 import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
+import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
 import {TRANSPORT_OPTIONS} from "../data/transports.ts";
 import databaseService, {type AttendeeData} from "../services/databaseService.ts";
 import {useFormState} from "../hooks/useFormState.ts";
@@ -94,7 +95,8 @@ export function WeddingVote() {
                 <FloatingPetals count={isMobile ? 12 : 50} />
             </div>
 
-            {/* Floating Location Button */}
+            {/* Floating Buttons */}
+            <FloatingCalendarButton />
             <FloatingLocationButton />
 
             {/* Back button */}

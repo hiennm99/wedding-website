@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
 
                 <div className="max-w-4xl mx-auto text-center relative z-20">
                     <div className="mb-12">
-                        <p className="text-rose-600 text-4xl md:text-5xl mb-6 font-['Allura'] italic tracking-wide pb-10">
+                        <p className="text-rose-600 text-4xl md:text-5xl mb-6 font-['Allura'] italic font-bold tracking-wide pb-10">
                             Save the Date
                         </p>
                         <h1 className="text-pink-400 text-7xl lg:text-6xl font-['Allura'] font-bold mb-8 tracking-wide">

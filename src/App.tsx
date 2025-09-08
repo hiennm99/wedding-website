@@ -11,6 +11,7 @@ import {Thankful} from "./components/Thankful.tsx";
 import {useAssetPreloader} from "./hooks/useAssetPreloader.ts";
 import {LoadingScreen} from "./components/LoadingScreen.tsx";
 import {WeddingVote} from "./components/WeddingVote.tsx";
+import {WeddingCalendar} from "./components/WeddingCalendar.tsx";
 
 const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
 
@@ -115,6 +116,15 @@ const AppRoutes: React.FC = () => {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="/calendar" element={<WeddingCalendar />} />
+                {/*<Route*/}
+                {/*    path="/calendar"*/}
+                {/*    element={*/}
+                {/*        <ProtectedRoute>*/}
+                {/*            <WeddingCalendar />*/}
+                {/*        </ProtectedRoute>*/}
+                {/*    }*/}
+                {/*/>*/}
                 <Route
                     path="/vote"
                     element={

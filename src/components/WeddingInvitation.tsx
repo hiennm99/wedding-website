@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {Header} from "./Header.tsx";
 import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
+import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
 
 // Main Wedding Invitation Component
 const WeddingInvitation: React.FC = () => {
@@ -36,7 +37,9 @@ const WeddingInvitation: React.FC = () => {
             {/* Background with gradient fade-in effect */}
 
             {/* Floating Location Button */}
+            <FloatingCalendarButton />
             <FloatingLocationButton />
+
 
             {/* Main Content Container */}
             <div className={`relative z-10 transition-all duration-2000 ease-out ${

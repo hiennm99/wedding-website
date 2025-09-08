@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {CircularImage} from "./common/CircularImage.tsx";
 import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
+import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
 import {FloatingPetals} from "./FloatingPetals.tsx";
 
 const GalleryCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/GalleryCouple.webp';
@@ -52,7 +53,8 @@ export const Thankful: React.FC = () => {
                 <FloatingPetals count={isMobile ? 12 : 50} />
             </div>
 
-            {/* Floating Location Button */}
+            {/* Floating Buttons */}
+            <FloatingCalendarButton />
             <FloatingLocationButton />
 
             {/* Main Content */}
