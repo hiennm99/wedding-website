@@ -4,7 +4,7 @@ import {useNavigate} from "react-router";
 import {LoadingScreen} from "./LoadingScreen.tsx";
 
 const BackgroundMusic = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/musics/BackgroundMusic.mp3';
-const Envelope = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Envelope.webp';
+const Envelope = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Envelope2.webp';
 
 interface Bubble {
     id: number;
@@ -178,7 +178,7 @@ export const WeddingEnvelope: React.FC = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-pink-400/30 to-purple-400/30 rounded-3xl blur-2xl scale-105 sm:scale-110 md:scale-115 animate-pulse"></div>
 
                             {/* Main card with auto scaling */}
-                            <div className={`relative p-1 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 max-w-sm mx-auto transform transition-all duration-1000 ${
+                            <div className={`relative p-1 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto transform transition-all duration-1000 ${
                                 autoHover ? 'scale-105 shadow-3xl' : 'scale-100'
                             }`}>
 
