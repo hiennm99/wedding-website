@@ -67,67 +67,79 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
         onClose();
     }, [resetForm, onClose, isSubmitting]);
 
-    // Prevent scroll when modal is open
+    // Prevent background scroll when modal is open
     useEffect(() => {
         if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
+            // Store current scroll position
+            const scrollY = window.scrollY;
 
-        return () => {
-            document.body.style.overflow = 'auto';
-        };
+            // Prevent background scroll
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+            document.documentElement.style.overflow = 'hidden';
+
+            return () => {
+                // Restore scroll position when modal closes
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.documentElement.style.overflow = '';
+                window.scrollTo(0, scrollY);
+            };
+        }
     }, [isOpen]);
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-            {/* Simplified background - no complex gradients or blur on mobile */}
+        <div className="fixed inset-0 z-50">
+            {/* Background overlay */}
             <div
                 className={`absolute inset-0 ${
                     isMobile
-                        ? 'bg-black/40'
+                        ? 'bg-black/50'
                         : 'bg-gradient-to-br from-pink-300/20 via-purple-300/15 to-rose-300/20 backdrop-blur-sm'
                 }`}
                 onClick={handleClose}
             />
 
-            {/* Reduced floating petals */}
+            {/* Floating petals - only on desktop */}
             {!isMobile && (
                 <div className="absolute inset-0 pointer-events-none">
                     <FloatingPetals count={6} />
                 </div>
             )}
 
-            {/* Center container */}
-            <div className="flex min-h-screen items-start justify-center pt-4 pb-4 px-4">
-                {/* Modal content - simplified on mobile */}
-                <div className={`relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl shadow-xl border ${
-                    isMobile
-                        ? 'bg-white border-gray-200'
-                        : 'bg-white/95 backdrop-blur-md border-white/30'
-                }`}>
-                    {/* Close button */}
-                    <button
-                        onClick={handleClose}
-                        disabled={isSubmitting}
-                        className="absolute -top-1 -right-1 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
-                        aria-label="Đóng modal"
-                    >
-                        ×
-                    </button>
+            {/* Modal container with its own scroll */}
+            <div className="absolute inset-0 flex items-start justify-center p-4 overflow-y-auto">
+                <div className="w-full max-w-2xl my-auto">
+                    {/* Modal content */}
+                    <div className={`relative w-full rounded-2xl shadow-xl border ${
+                        isMobile
+                            ? 'bg-white border-gray-200'
+                            : 'bg-white/95 backdrop-blur-md border-white/30'
+                    }`}>
+                        {/* Close button */}
+                        <button
+                            onClick={handleClose}
+                            disabled={isSubmitting}
+                            className="absolute -top-2 -right-2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 text-xl font-bold shadow-md border disabled:opacity-50"
+                            aria-label="Đóng modal"
+                        >
+                            ×
+                        </button>
 
-                    {/* Header - simplified */}
-                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100">
-                        <h2 className="text-2xl text-rose-600 text-center font-semibold">
-                            Mời mọi người cùng tham dự nha
-                        </h2>
-                    </div>
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100 rounded-t-2xl">
+                            <h2 className="text-2xl text-rose-600 text-center font-semibold">
+                                Mời mọi người cùng tham dự nha
+                            </h2>
+                        </div>
 
-                    {/* Form content - scrollable area */}
-                    <div className="max-h-[calc(90vh-100px)] overflow-y-auto">
+                        {/* Form content */}
                         <div className="p-6 space-y-5">
                             {/* Attendee Name */}
                             <FormSection title="👤 Tên của bạn">
@@ -175,14 +187,14 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
 
                             {/* Message */}
                             <FormSection title="💌 Lời chúc cho cô dâu chú rể">
-                <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
-                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none text-sm"
-                    rows={3}
-                    disabled={isSubmitting}
-                />
+                                <textarea
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
+                                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none text-sm"
+                                    rows={3}
+                                    disabled={isSubmitting}
+                                />
                             </FormSection>
 
                             {/* Submit button */}
@@ -205,31 +217,50 @@ export function VoteModal({ isOpen = true, onClose = () => {} }) {
                 </div>
             </div>
 
-            {/* CSS for simplified animations */}
+            {/* CSS for animations */}
             <style dangerouslySetInnerHTML={{
                 __html: `
-          @keyframes float-simple {
-            0%, 100% {
-              transform: translateY(0px);
-              opacity: 0.2;
-            }
-            50% {
-              transform: translateY(-10px);
-              opacity: 0.4;
-            }
-          }
-          
-          .animate-float-simple {
-            animation: float-simple 4s ease-in-out infinite;
-          }
-          
-          /* Reduce animations on mobile */
-          @media (max-width: 767px) {
-            .animate-float-simple {
-              animation: none;
-            }
-          }
-        `
+                    @keyframes float-simple {
+                        0%, 100% {
+                            transform: translateY(0px);
+                            opacity: 0.2;
+                        }
+                        50% {
+                            transform: translateY(-10px);
+                            opacity: 0.4;
+                        }
+                    }
+                    
+                    .animate-float-simple {
+                        animation: float-simple 4s ease-in-out infinite;
+                    }
+                    
+                    /* Reduce animations on mobile */
+                    @media (max-width: 767px) {
+                        .animate-float-simple {
+                            animation: none;
+                        }
+                    }
+
+                    /* Custom scrollbar for modal */
+                    .modal-scroll::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    
+                    .modal-scroll::-webkit-scrollbar-track {
+                        background: rgba(255, 192, 203, 0.1);
+                        border-radius: 3px;
+                    }
+                    
+                    .modal-scroll::-webkit-scrollbar-thumb {
+                        background: rgba(219, 39, 119, 0.3);
+                        border-radius: 3px;
+                    }
+                    
+                    .modal-scroll::-webkit-scrollbar-thumb:hover {
+                        background: rgba(219, 39, 119, 0.5);
+                    }
+                `
             }} />
         </div>
     );
