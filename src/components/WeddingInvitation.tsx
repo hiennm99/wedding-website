@@ -34,47 +34,6 @@ const WeddingInvitation: React.FC = () => {
     return (
         <div className="font-sans antialiased relative min-h-screen">
             {/* Background with gradient fade-in effect */}
-            <div className={`fixed inset-0 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 transition-all duration-2000 ease-out ${
-                isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
-            }`} />
-
-            {/* Floating background elements */}
-            <div className={`fixed inset-0 pointer-events-none transition-all duration-3000 ease-out ${
-                isVisible ? 'opacity-30' : 'opacity-0'
-            }`}>
-                {/* Floating hearts */}
-                {[...Array(20)].map((_, i) => (
-                    <div
-                        key={`heart-${i}`}
-                        className="absolute text-pink-300 animate-float"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            fontSize: `${Math.random() * 20 + 10}px`,
-                            animationDelay: `${Math.random() * 3}s`,
-                            animationDuration: `${Math.random() * 4 + 6}s`
-                        }}
-                    >
-                        💕
-                    </div>
-                ))}
-
-                {/* Floating sparkles */}
-                {[...Array(15)].map((_, i) => (
-                    <div
-                        key={`sparkle-${i}`}
-                        className="absolute text-yellow-300 animate-twinkle"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            fontSize: `${Math.random() * 15 + 8}px`,
-                            animationDelay: `${Math.random() * 2}s`
-                        }}
-                    >
-                        ✨
-                    </div>
-                ))}
-            </div>
 
             {/* Floating Location Button */}
             <FloatingLocationButton />

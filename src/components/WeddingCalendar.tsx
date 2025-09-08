@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
+const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
+
 export function WeddingCalendar() {
     const [isVisible, setIsVisible] = useState(false);
     const calendarRef = useRef(null);
@@ -41,6 +43,11 @@ export function WeddingCalendar() {
 
     return (
         <div className="flex justify-center items-center h-full">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100" />
+            <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+                style={{ backgroundImage: `url(${Background})` }}
+            />
             <div ref={calendarRef} className="relative">
                 <style dangerouslySetInnerHTML={{
                     __html: `

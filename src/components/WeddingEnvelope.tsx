@@ -1,11 +1,9 @@
+
 import React, {useState, useRef, useEffect, useCallback} from "react";
 import {useNavigate} from "react-router";
-import {FloatingPetals} from "./FloatingPetals.tsx";
 import {LoadingScreen} from "./LoadingScreen.tsx";
-import {detectMobile} from "../hooks/detectMobile.ts";
 
 const BackgroundMusic = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/musics/BackgroundMusic.mp3';
-const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
 const Envelope = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Envelope.webp';
 
 interface Bubble {
@@ -19,11 +17,12 @@ interface Bubble {
 }
 
 export const WeddingEnvelope: React.FC = () => {
-    const isMobile = detectMobile();
     const navigate = useNavigate();
-    const [showWelcome, setShowWelcome] = useState(true);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [isBubbleTransition, setIsBubbleTransition] = useState(false);
+    const [, setIsVisible] = useState<boolean>(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [showWelcome, setShowWelcome] = useState<boolean>(true);
+    const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+    const [isBubbleTransition, setIsBubbleTransition] = useState<boolean>(false);
     const [bubbles, setBubbles] = useState<Bubble[]>([]);
     const [loadingProgress, ] = useState(0);
     const [currentlyLoading, ] = useState('');
@@ -39,6 +38,23 @@ export const WeddingEnvelope: React.FC = () => {
         duration: number;
         blur: number;
     }>>([]);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        // Animation entrance
+        const timer = setTimeout(() => setIsVisible(true), 100);
+
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+            clearTimeout(timer);
+        };
+    }, []);
 
     const audioRef = useRef(new Audio(BackgroundMusic));
 
@@ -150,19 +166,6 @@ export const WeddingEnvelope: React.FC = () => {
                 <div className={`absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100 transition-all duration-2000 ${
                     isBubbleTransition ? 'opacity-0 scale-110' : 'opacity-100'
                 }`} />
-                <div
-                    className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 transition-all duration-2000 ${
-                        isBubbleTransition ? 'opacity-0 scale-110' : 'opacity-20'
-                    }`}
-                    style={{ backgroundImage: `url(${Background})` }}
-                />
-
-                {/* Floating petals */}
-                <div className={`transition-all duration-2000 ${
-                    isBubbleTransition ? 'opacity-0 scale-150' : 'opacity-100'
-                }`}>
-                    <FloatingPetals count={isMobile ? 30 : 50} />
-                </div>
 
                 {/* Main content container */}
                 <div className={`relative z-10 flex items-center justify-center min-h-screen p-6 transition-all duration-2000 ${

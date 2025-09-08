@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import {FloatingPetals} from "./FloatingPetals.tsx";
 import {RadioButton} from "./button/RadioButton.tsx";
 import {FormSection} from "./FormSection.tsx";
+import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
 import {TRANSPORT_OPTIONS} from "../data/transports.ts";
 
 export function WeddingVote() {
@@ -65,35 +66,21 @@ export function WeddingVote() {
         }
     }, [attendee, joinable, transport, message, navigate, resetForm]);
 
-    const handleLocationClick = () => {
-        window.open('https://maps.app.goo.gl/pEpZV62sEixZvXgC7', '_blank');
-    };
-
     const handleBackToInvitation = () => {
         navigate('/home');
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 relative">
+        <div className="min-h-screen relative">
             {/* Background floating elements */}
             <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 ${
                 isVisible ? 'opacity-30' : 'opacity-0'
             }`}>
-                {!isMobile && <FloatingPetals count={12} />}
+                <FloatingPetals count={isMobile ? 12 : 50} />
             </div>
 
             {/* Floating Location Button */}
-            <div className="fixed bottom-6 right-6 z-50">
-                <button
-                    onClick={handleLocationClick}
-                    className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300"
-                    aria-label="View Location"
-                >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                </button>
-            </div>
+            <FloatingLocationButton />
 
             {/* Back button */}
             <div className="fixed top-6 left-6 z-50">
@@ -118,8 +105,8 @@ export function WeddingVote() {
                     <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
                         {/* Form Header */}
                         <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-100">
-                            <h2 className="text-5xl text-rose-600 text-center font-['Allura']">
-                                Mời mọi người cùng tham dự nha
+                            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-rose-600 text-center font-['Allura']">
+                                ✨ Mời mọi người cùng tham dự nha ✨
                             </h2>
                         </div>
 
@@ -131,7 +118,7 @@ export function WeddingVote() {
                                     value={attendee}
                                     onChange={(e) => setAttendee(e.target.value)}
                                     placeholder="Vui lòng nhập họ và tên..."
-                                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 transition-colors"
+                                    className="w-full bg-white border-2 border-rose-300 rounded-2xl px-4 py-3 text-rose-700 italic font-light placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 transition-colors"
                                     required
                                     disabled={isSubmitting}
                                 />
@@ -178,7 +165,7 @@ export function WeddingVote() {
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
-                                    className="w-full bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none transition-colors"
+                                    className="w-full italic font-light bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none transition-colors"
                                     rows={4}
                                     disabled={isSubmitting}
                                 />
@@ -193,15 +180,12 @@ export function WeddingVote() {
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-2xl animate-spin"></div>
                                             Đang gửi...
                                         </>
                                     ) : (
                                         <>
-                                            <span>GỬI XÁC NHẬN</span>
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                            </svg>
+                                            <span>✨ GỬI XÁC NHẬN ✨</span>
                                         </>
                                     )}
                                 </button>

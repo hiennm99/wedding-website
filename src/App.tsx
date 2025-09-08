@@ -12,6 +12,8 @@ import {useAssetPreloader} from "./hooks/useAssetPreloader.ts";
 import {LoadingScreen} from "./components/LoadingScreen.tsx";
 import {WeddingVote} from "./components/WeddingVote.tsx";
 
+const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
+
 // Navigation Context
 interface NavigationContextType {
     hasVisitedHome: boolean;
@@ -94,8 +96,15 @@ const AppRoutes: React.FC = () => {
         );
     }
 
+
+
     return (
         <div className="App">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100" />
+            <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+                style={{ backgroundImage: `url(${Background})` }}
+            />
             <Routes>
                 <Route path="/" element={<WeddingMusicWithTracking />} />
                 <Route

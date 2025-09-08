@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from "react";
 import {CircularImage} from "./common/CircularImage.tsx";
 import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
+import {FloatingPetals} from "./FloatingPetals.tsx";
 
 const GalleryCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/GalleryCouple.webp';
 
 export const Thankful: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [showContent, setShowContent] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        // Animation entrance
+        const timer = setTimeout(() => setIsVisible(true), 100);
+
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+            clearTimeout(timer);
+        };
+    }, []);
 
     useEffect(() => {
         // Animation entrance sequence
@@ -26,42 +45,11 @@ export const Thankful: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 relative overflow-hidden">
-            {/* Background decorative elements */}
-            <div className={`fixed inset-0 pointer-events-none transition-all duration-2000 ${
-                isVisible ? 'opacity-20' : 'opacity-0'
+            {/* Background floating elements */}
+            <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 ${
+                isVisible ? 'opacity-30' : 'opacity-0'
             }`}>
-                {/* Floating hearts */}
-                {[...Array(12)].map((_, i) => (
-                    <div
-                        key={`heart-${i}`}
-                        className="absolute text-pink-300 animate-float"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            fontSize: `${Math.random() * 20 + 15}px`,
-                            animationDelay: `${Math.random() * 3}s`,
-                            animationDuration: `${Math.random() * 4 + 6}s`
-                        }}
-                    >
-                        💕
-                    </div>
-                ))}
-
-                {/* Floating sparkles */}
-                {[...Array(8)].map((_, i) => (
-                    <div
-                        key={`sparkle-${i}`}
-                        className="absolute text-yellow-300 animate-twinkle"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            fontSize: `${Math.random() * 15 + 10}px`,
-                            animationDelay: `${Math.random() * 2}s`
-                        }}
-                    >
-                        ✨
-                    </div>
-                ))}
+                <FloatingPetals count={isMobile ? 12 : 50} />
             </div>
 
             {/* Floating Location Button */}

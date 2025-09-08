@@ -1,32 +1,50 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import type {HeaderProps} from "../types";
 // import {WeddingInfoCard} from "./WeddingInfoCard.tsx";
 import {CircularImage} from "./common/CircularImage.tsx";
 import {FloatingPetals} from "./FloatingPetals.tsx";
 import {WeddingCalendar} from "./WeddingCalendar.tsx";
-// import HeroCouple from '../assets/images/HeroCouple.webp';
-// import Background from '../assets/images/Background.webp';
+import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
 
-const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
 const HeroCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/HeroCouple.webp';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
     const handleOpenModal = useCallback(() => {
         onOpenModal();
     }, [onOpenModal]);
 
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        // Animation entrance
+        const timer = setTimeout(() => setIsVisible(true), 100);
+
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+            clearTimeout(timer);
+        };
+    }, []);
+
     return (
         <>
             <section className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pt-10">
-                {/* Background layers */}
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100" />
-                <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-                    style={{ backgroundImage: `url(${Background})` }}
-                />
+                {/* Background floating elements */}
+                <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 ${
+                    isVisible ? 'opacity-30' : 'opacity-0'
+                }`}>
+                    <FloatingPetals count={isMobile ? 12 : 50} />
+                </div>
 
-                {/* Floating petals */}
-                <FloatingPetals count={50} />
+                {/* Floating Location Button */}
+                <FloatingLocationButton />
 
                 <div className="max-w-4xl mx-auto text-center relative z-20">
                     <div className="mb-12">
@@ -54,15 +72,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
                 </div>
             </section>
             <section className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pt-10">
-                {/* Background layers */}
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100" />
-                <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-                    style={{ backgroundImage: `url(${Background})` }}
-                />
-
-                {/* Floating petals */}
-                <FloatingPetals count={50} />
                 <WeddingCalendar/>
             </section>
         </>

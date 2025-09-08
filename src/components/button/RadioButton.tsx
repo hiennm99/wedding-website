@@ -9,7 +9,7 @@ export const RadioButton: React.FC<RadioButtonProps> = ({ checked, onClick, labe
         onClick={onClick}
     >
         <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-            checked ? 'border-rose-400 bg-rose-400' : 'border-pink-300'
+            checked ? 'border-rose-400 bg-rose-400 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 transition-colors' : 'border-pink-300' 
         }`}>
             {checked && <div className="w-2 h-2 bg-white rounded-full"></div>}
         </div>
