@@ -45,7 +45,7 @@ export const Thankful: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-purple-50 relative overflow-hidden">
             {/* Background floating elements */}
             <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 ${
                 isVisible ? 'opacity-30' : 'opacity-0'
@@ -65,7 +65,7 @@ export const Thankful: React.FC = () => {
                     {/* Thank you card */}
                     <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
                         {/* Header */}
-                        <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 sm:px-8 py-6 border-b border-pink-100">
+                        <div className="bg-gradient-to-r from-pink-100 to-rose-100 px-6 sm:px-8 py-6 border-b border-pink-100">
                             <div className="text-center">
                                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-rose-600 mb-2">
                                     🎉 Cảm ơn bạn! 🎉
@@ -74,7 +74,7 @@ export const Thankful: React.FC = () => {
                         </div>
 
                         {/* Content */}
-                        <div className="p-6 sm:p-8 lg:p-12">
+                        <div className="p-6 sm:p-8 lg:p-12 bg-gradient-to-r from-pink-50 to-rose-50">
                             <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
                                 {/* Image */}
                                 <div className="flex-shrink-0 order-2 lg:order-1">
@@ -105,7 +105,7 @@ export const Thankful: React.FC = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 sm:px-8 py-4 border-t border-pink-100">
+                        <div className="bg-gradient-to-r from-pink-100 to-rose-100 px-6 sm:px-8 py-4 border-t border-pink-100">
                             <div className="text-center">
                                 <p className="text-rose-400 text-xs sm:text-sm">
                                     💕 Hiền & Vi 💕
