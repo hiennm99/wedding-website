@@ -65,10 +65,3 @@ export interface AirtableRecord {
 export interface AirtablePayload {
     records: AirtableRecord[];
 }
-
-export interface ServiceResponse {
-    success: boolean;
-    message: string;
-    data?: any;
-    error?: any;
-}

@@ -5,18 +5,23 @@ import {RadioButton} from "./button/RadioButton.tsx";
 import {FormSection} from "./FormSection.tsx";
 import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
 import {TRANSPORT_OPTIONS} from "../data/transports.ts";
+import databaseService, {type AttendeeData} from "../services/databaseService.ts";
+import {useFormState} from "../hooks/useFormState.ts";
 
 export function WeddingVote() {
     const navigate = useNavigate();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
     // Form state
-    const [attendee, setAttendee] = useState('');
-    const [joinable, setJoinable] = useState(true);
-    const [transport, setTransport] = useState('car');
-    const [message, setMessage] = useState('');
+    const {
+        attendee, setAttendee,
+        joinable, setJoinable,
+        transport, setTransport,
+        message, setMessage,
+        resetForm
+    } = useFormState();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -35,14 +40,8 @@ export function WeddingVote() {
         };
     }, []);
 
-    const resetForm = useCallback(() => {
-        setAttendee('');
-        setJoinable(true);
-        setTransport('car');
-        setMessage('');
-    }, []);
-
     const handleSubmit = useCallback(async () => {
+        // Validate required fields
         if (!attendee.trim()) {
             alert('Vui lòng nhập tên của bạn');
             return;
@@ -50,21 +49,37 @@ export function WeddingVote() {
 
         setIsSubmitting(true);
 
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            console.log('Form submitted:', { attendee, joinable, transport, message });
+        // Format data for Supabase
+        const formData: AttendeeData = {
+            attendee: attendee.trim(),
+            joinable: joinable ? 'Có' : 'Không',
+            transport: joinable ? transport : '',
+            message: message.trim()
+        };
 
-            // Navigate to thank you page
-            navigate('/thankful');
-            resetForm()
+        console.log('Submitting to Supabase:', formData);
+
+        try {
+            const result = await databaseService.insertData(formData);
+
+            if (result.success) {
+                console.log('Success:', result.message);
+                // Navigate and cleanup
+                navigate('/thankful');
+                resetForm();
+            } else {
+                console.error('Failed:', result.message);
+                alert('❌ Có lỗi xảy ra: ' + result.message);
+                alert('⚠ Có lỗi xảy ra: ' + result.message);
+            }
         } catch (error) {
             console.error('Submit error:', error);
+            alert('❌ Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
             alert('⚠ Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
         } finally {
             setIsSubmitting(false);
         }
-    }, [attendee, joinable, transport, message, navigate, resetForm]);
+    }, [attendee, joinable, transport, message, navigate, resetForm]); // Added missing closing brace and dependencies
 
     const handleBackToInvitation = () => {
         navigate('/home');
