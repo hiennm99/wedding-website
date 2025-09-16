@@ -19,12 +19,10 @@ jobs:
         with:
           node-version: '18'
 
-
-
       - name: Keep Supabase Active (Simple HTTP Ping)
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: https://agcgbihujvgkemhglthq.supabase.co
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY2diaWh1anZna2VtaGdsdGhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5NzEwNzUsImV4cCI6MjA3MjU0NzA3NX0.5Cx-VOZIcnhdA800THsBPh2DdMzgXlKqsWNiijKz1GQ
         run: |
           echo "Pinging Supabase at $(date)"
           
