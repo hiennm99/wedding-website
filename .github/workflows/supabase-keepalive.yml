@@ -19,57 +19,30 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
-        run: |
-          npm init -y
-          npm install @supabase/supabase-js
 
-      - name: Keep Supabase Active
+
+      - name: Keep Supabase Active (Simple HTTP Ping)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          cat << 'EOF' > keepalive.js
-          const { createClient } = require('@supabase/supabase-js');
+          echo "Pinging Supabase at $(date)"
           
-          async function keepAlive() {
-            try {
-              const supabase = createClient(
-                process.env.SUPABASE_URL,
-                process.env.SUPABASE_ANON_KEY
-              );
+          # Ping REST API endpoint
+          response=$(curl -s -w "%{http_code}" -X GET \
+            "$SUPABASE_URL/rest/v1/" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
           
-              // Thực hiện một query đơn giản
-              const { data, error } = await supabase
-                .from('_supabase_migrations') // Bảng system của Supabase
-                .select('count')
-                .limit(1);
+          http_code="${response: -3}"
           
-              if (error) {
-                console.log('Query with system table failed, trying simple ping...');
-          
-                // Fallback: tạo bảng tạm và query
-                const { error: pingError } = await supabase.rpc('version');
-          
-                if (pingError) {
-                  console.error('Ping failed:', pingError);
-                  process.exit(1);
-                }
-              }
-          
-              console.log('✅ Supabase pinged successfully!');
-              console.log('Timestamp:', new Date().toISOString());
-          
-            } catch (error) {
-              console.error('❌ Error keeping Supabase alive:', error);
-              process.exit(1);
-            }
-          }
-          
-          keepAlive();
-          EOF
-          
-          node keepalive.js
+          if [[ "$http_code" -ge 200 && "$http_code" -lt 300 ]]; then
+            echo "✅ Supabase ping successful! HTTP: $http_code"
+          else
+            echo "❌ Supabase ping failed! HTTP: $http_code"
+            echo "Response: ${response%???}"
+            exit 1
+          fi
 
       - name: Log completion
         run: |
