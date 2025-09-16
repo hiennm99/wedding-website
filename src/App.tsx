@@ -106,7 +106,7 @@ const AppRoutes: React.FC = () => {
                 style={{ backgroundImage: `url(${Background})` }}
             />
             <Routes>
-                <Route path="/" element={<WeddingMusicWithTracking />} />
+                <Route path="" element={<WeddingMusicWithTracking />} />
                 <Route
                     path="/home"
                     element={
@@ -131,7 +131,7 @@ const AppRoutes: React.FC = () => {
                         </ProtectedRoute>
                     }
                 />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="" replace />} />
             </Routes>
         </div>
     );

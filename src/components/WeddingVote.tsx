@@ -7,7 +7,7 @@ import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
 import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
 import {TRANSPORT_OPTIONS} from "../data/transports.ts";
 import databaseService, {type AttendeeData} from "../services/databaseService.ts";
-import {useFormState} from "../hooks/useFormState.ts";
+import {useAttendeeStore} from "../stores/attendeeStore.ts";
 
 export function WeddingVote() {
     const navigate = useNavigate();
@@ -15,15 +15,20 @@ export function WeddingVote() {
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
-    // Form state
+    // Zustand store
     const {
-        attendee, setAttendee,
-        joinable, setJoinable,
-        hasRelative, setHasRelative,
-        transport, setTransport,
-        message, setMessage,
-        resetForm
-    } = useFormState();
+        name: attendee,
+        joinable,
+        hasRelative,
+        transport,
+        message,
+        setAttendee,
+        setJoinable,
+        setHasRelative,
+        setTransport,
+        setMessage,
+        setSubmitted
+    } = useAttendeeStore();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -67,9 +72,12 @@ export function WeddingVote() {
 
             if (result.success) {
                 console.log('Success:', result.message);
-                // Navigate and cleanup
+
+                // Mark as submitted in store
+                setSubmitted(true);
+
+                // Navigate to thank you page
                 navigate('/thankful');
-                resetForm();
             } else {
                 console.error('Failed:', result.message);
                 alert('❌ Có lỗi xảy ra: ' + result.message);
@@ -80,7 +88,7 @@ export function WeddingVote() {
         } finally {
             setIsSubmitting(false);
         }
-    }, [attendee, joinable, hasRelative, transport, message, navigate, resetForm]);
+    }, [attendee, joinable, hasRelative, transport, message, navigate, setSubmitted]);
 
     const handleBackToInvitation = () => {
         navigate('/home');

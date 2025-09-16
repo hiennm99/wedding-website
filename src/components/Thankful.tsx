@@ -1,15 +1,26 @@
-import { useState, useEffect } from "react";
-import {FloatingPetals} from "./FloatingPetals.tsx";
-import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
-import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { FloatingPetals } from "./FloatingPetals.tsx";
+import { useAttendeeStore } from "../stores/attendeeStore.ts";
 import {CircularImage} from "./common/CircularImage.tsx";
 
 const GalleryCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/GalleryCouple.webp';
 
-export const Thankful = () => {
-    const [isVisible, setIsVisible] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-    const [showContent, setShowContent] = useState(false);
+export function Thankful() {
+    const navigate = useNavigate();
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+
+    // Get data from Zustand store
+    const {
+        name,
+        joinable,
+        isSubmitted,
+        getDisplayName,
+        resetStore
+    } = useAttendeeStore();
+
+    const attendeeName = getDisplayName();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -19,6 +30,12 @@ export const Thankful = () => {
         checkMobile();
         window.addEventListener('resize', checkMobile);
 
+        // Redirect if no submission data
+        if (!isSubmitted && !name.trim()) {
+            navigate('/vote');
+            return;
+        }
+
         // Animation entrance
         const timer = setTimeout(() => setIsVisible(true), 100);
 
@@ -26,105 +43,135 @@ export const Thankful = () => {
             window.removeEventListener('resize', checkMobile);
             clearTimeout(timer);
         };
-    }, []);
+    }, [isSubmitted, name, navigate]);
 
-    useEffect(() => {
-        // Animation entrance sequence
-        const timer1 = setTimeout(() => {
-            setIsVisible(true);
+
+    const handleBackToHome = () => {
+        // Navigate FIRST before clearing store
+        navigate('/', { replace: true });
+
+        // Then clear the form data - do this after navigation
+        setTimeout(() => {
+            resetStore();
         }, 100);
+    };
 
-        const timer2 = setTimeout(() => {
-            setShowContent(true);
-        }, 600);
-
-        return () => {
-            clearTimeout(timer1);
-            clearTimeout(timer2);
-        };
-    }, []);
+    const handleBackToForm = () => {
+        navigate('/vote');
+    };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-purple-50 relative overflow-hidden">
+        <div className="min-h-screen relative bg-gradient-to-br from-pink-50 via-rose-50 to-orange-50">
             {/* Background floating elements */}
             <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 ${
-                isVisible ? 'opacity-30' : 'opacity-0'
+                isVisible ? 'opacity-40' : 'opacity-0'
             }`}>
-                <FloatingPetals count={isMobile ? 12 : 50} />
+                <FloatingPetals count={isMobile ? 15 : 60} />
             </div>
 
-            {/* Floating Buttons */}
-            <FloatingCalendarButton />
-            <FloatingLocationButton />
-
             {/* Main Content */}
-            <div className={`relative z-10 min-h-screen flex items-center justify-center px-4 py-12 transition-all duration-1000 ${
-                showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            <div className={`container mx-auto px-4 py-8 transition-all duration-1000 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}>
-                <div className="max-w-6xl w-full mx-auto">
-                    {/* Thank you card */}
-                    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+                <div className="max-w-2xl mx-auto text-center">
+                    {/* Thank you message */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 p-8 mb-8">
                         {/* Header */}
-                        <div className="bg-gradient-to-r from-pink-200 to-rose-200 px-6 sm:px-8 py-6 border-b border-pink-200">
-                            <div className="text-center">
-                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-rose-600 mb-2">
-                                    🎉 Cảm ơn bạn! 🎉
-                                </h1>
-                            </div>
+                        <div className="mb-6">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-rose-600 font-['Allura'] mb-4">
+                                Cảm ơn {attendeeName}! ✨
+                            </h1>
+                            <div className="w-24 h-1 bg-gradient-to-r from-pink-400 to-rose-400 mx-auto rounded-full"></div>
                         </div>
 
-                        {/* Content */}
-                        <div className="p-6 sm:p-8 lg:p-12 bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200">
-                            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
-                                {/* Image */}
-                                <div className="flex-shrink-0 order-2 lg:order-1">
-                                    <div className={`transition-all duration-1000 delay-300 ${
-                                        showContent ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                                    }`}>
-                                        <CircularImage
-                                            src={GalleryCouple}
-                                            alt="Cảm ơn bạn đã tham dự"
-                                            size="w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96"
-                                        />
+                        {/* Content based on attendance */}
+                        <div className="space-y-6">
+                            {joinable ? (
+                                <>
+                                    <div className="text-6xl mb-4">🎉</div>
+                                    <h2 className="text-xl sm:text-2xl text-rose-700 font-semibold mb-4">
+                                        Tuyệt vời! Chúng tôi rất mong được gặp {attendeeName}!
+                                    </h2>
+                                    <p className="text-rose-600 text-lg leading-relaxed">
+                                        Cảm ơn {attendeeName} đã xác nhận tham dự đám cưới của chúng tôi.
+                                        Sự hiện diện của {attendeeName} sẽ làm cho ngày đặc biệt này trở nên ý nghĩa hơn! 💕
+                                    </p>
+                                    <div className="bg-gradient-to-r from-pink-100 to-rose-100 rounded-2xl p-4 mt-6">
+                                        <p className="text-rose-700 font-medium">
+                                            📅 Hẹn gặp {attendeeName} vào ngày cưới nhé!
+                                        </p>
+                                        <p className="text-rose-600 text-sm mt-2">
+                                            Chúng tôi sẽ gửi thêm thông tin chi tiết sớm thôi!
+                                        </p>
                                     </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="text-6xl mb-4">💙</div>
+                                    <h2 className="text-xl sm:text-2xl text-rose-700 font-semibold mb-4">
+                                        Cảm ơn {attendeeName} đã thông báo!
+                                    </h2>
+                                    <p className="text-rose-600 text-lg leading-relaxed">
+                                        Chúng tôi hiểu {attendeeName} có những lý do riêng.
+                                        Dù không thể tham dự nhưng tình cảm của {attendeeName}
+                                         dành cho chúng tôi vẫn rất quý giá! 💝
+                                    </p>
+                                    <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl p-4 mt-6">
+                                        <p className="text-blue-700 font-medium">
+                                            Chúng tôi sẽ nhớ đến {attendeeName} trong ngày đặc biệt này!
+                                        </p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Couple Gallery Image */}
+                        <div className="mt-8 pt-6 border-t border-pink-200 items-center justify-center">
+                            <div className="text-center items-center justify-center">
+                                <div className="flex  mb-4 items-center justify-center"> {/* Thêm margin-bottom cho hình */}
+                                    <CircularImage
+                                        src={GalleryCouple}
+                                        alt="Cảm ơn bạn đã tham dự"
+                                        size="w-64 h-64 sm:w-48 sm:h-48 md:w-56 md:h-56"
+                                    />
+                                </div>
+                                {/* Fallback content if image doesn't load */}
+                                <div
+                                    style={{ display: 'none' }}
+                                    className="w-full max-w-md mx-auto aspect-square bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200 rounded-2xl flex flex-col items-center justify-center shadow-lg"
+                                >
+                                    <span className="text-6xl mb-4">💕</span>
+                                    <p className="text-rose-600 font-['Allura'] text-2xl">Hiền & Vi</p>
+                                    <p className="text-rose-400 text-sm mt-2">Gallery Coming Soon</p>
                                 </div>
 
-                                {/* Text Content */}
-                                <div className="flex-1 text-center lg:text-left order-1 lg:order-2">
-                                    <div className={`transition-all duration-1000 delay-500 ${
-                                        showContent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
-                                    }`}>
-                                        <div className="space-y-6">
-                                            <h2 className="text-5xl sm:text-2xl lg:text-4xl xl:text-4xl font-['Allura'] text-rose-600 leading-relaxed">
-                                                Sự hiện diện của bạn sẽ làm cho ngày đặc biệt của chúng tôi thêm ý nghĩa và trọn vẹn hơn
-                                            </h2>
-
-                                            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-rose-200 shadow-lg">
-                                                <h3 className="flex items-center justify-center mb-3">
-                                                    🚌
-                                                </h3>
-                                                <p className="text-rose-600 text-sm sm:text-base text-center leading-relaxed italic font-light">
-                                                    Sẽ có xe đưa đón cho mọi người<br />
-                                                    <span className="italic font-light">Thời gian và địa điểm sẽ thông báo sau</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gradient-to-r from-pink-200 to-rose-200 px-6 sm:px-8 py-4 border-t border-pink-200">
-                            <div className="text-center">
-                                <p className="text-rose-400 text-xs sm:text-sm">
-                                    💕 Hiền & Vi 💕
-                                </p>
-                                <p className="text-rose-300 text-xs mt-1">
-                                    Hẹn gặp bạn trong ngày trọng đại của chúng tôi
+                                <p className="text-rose-500 italic text-sm mt-4">
+                                    "Tình yêu không chỉ là nhìn vào mắt nhau, mà là cùng nhìn về một hướng" ✨
                                 </p>
                             </div>
                         </div>
+
+                        {/* Action buttons */}
+                        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                            <button
+                                onClick={handleBackToHome}
+                                className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                            >
+                                🏠 Về trang chủ
+                            </button>
+                            <button
+                                onClick={handleBackToForm}
+                                className="flex-1 bg-white hover:bg-gray-50 text-rose-600 px-6 py-3 rounded-2xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] border-2 border-rose-300"
+                            >
+                                ✏️ Sửa thông tin
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Additional info */}
+                    <div className="text-center text-rose-400 text-sm">
+                        <p className="mb-2">💌 Nếu có thay đổi, {attendeeName} có thể cập nhật lại thông tin bất cứ lúc nào</p>
+                        <p>🌸 Hiền & Vi 🌸</p>
                     </div>
                 </div>
             </div>
@@ -135,21 +182,10 @@ export const Thankful = () => {
                     @keyframes float {
                         0%, 100% {
                             transform: translateY(0px) rotate(0deg);
-                            opacity: 0.7;
+                            opacity: 0.6;
                         }
                         50% {
                             transform: translateY(-20px) rotate(180deg);
-                            opacity: 1;
-                        }
-                    }
-
-                    @keyframes twinkle {
-                        0%, 100% {
-                            transform: scale(0.8) rotate(0deg);
-                            opacity: 0.5;
-                        }
-                        50% {
-                            transform: scale(1.2) rotate(180deg);
                             opacity: 1;
                         }
                     }
@@ -158,14 +194,10 @@ export const Thankful = () => {
                         animation: float 6s ease-in-out infinite;
                     }
 
-                    .animate-twinkle {
-                        animation: twinkle 2s ease-in-out infinite;
-                    }
-
-                    /* Reduce animations on mobile for performance */
+                    /* Reduce animations on mobile */
                     @media (max-width: 767px) {
                         .animate-float {
-                            animation: float 8s ease-in-out infinite;
+                            animation: none;
                         }
                     }
 
@@ -177,4 +209,4 @@ export const Thankful = () => {
             }} />
         </div>
     );
-};
+}
