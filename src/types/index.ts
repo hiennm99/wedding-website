@@ -9,13 +9,14 @@ export interface FormState {
     setAttendee: (value: string) => void;
     joinable: boolean;
     setJoinable: (value: boolean) => void;
+    hasRelative: boolean;  // Make sure this matches
+    setHasRelative: (value: boolean) => void;  // Make sure this matches
     transport: string;
     setTransport: (value: string) => void;
     message: string;
     setMessage: (value: string) => void;
     resetForm: () => void;
 }
-
 export interface RadioButtonProps {
     checked: boolean;
     onClick: () => void;

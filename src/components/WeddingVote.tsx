@@ -19,6 +19,7 @@ export function WeddingVote() {
     const {
         attendee, setAttendee,
         joinable, setJoinable,
+        hasRelative, setHasRelative,
         transport, setTransport,
         message, setMessage,
         resetForm
@@ -50,10 +51,11 @@ export function WeddingVote() {
 
         setIsSubmitting(true);
 
-        // Format data for Supabase
+        // Format data for Supabase - Now matches database schema
         const formData: AttendeeData = {
             attendee: attendee.trim(),
-            joinable: joinable ? 'Có' : 'Không',
+            joinable: joinable,  // Keep as boolean
+            has_relative: hasRelative,  // Keep as boolean
             transport: joinable ? transport : '',
             message: message.trim()
         };
@@ -71,16 +73,14 @@ export function WeddingVote() {
             } else {
                 console.error('Failed:', result.message);
                 alert('❌ Có lỗi xảy ra: ' + result.message);
-                alert('⚠ Có lỗi xảy ra: ' + result.message);
             }
         } catch (error) {
             console.error('Submit error:', error);
             alert('❌ Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
-            alert('⚠ Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
         } finally {
             setIsSubmitting(false);
         }
-    }, [attendee, joinable, transport, message, navigate, resetForm]); // Added missing closing brace and dependencies
+    }, [attendee, joinable, hasRelative, transport, message, navigate, resetForm]);
 
     const handleBackToInvitation = () => {
         navigate('/home');
@@ -161,19 +161,37 @@ export function WeddingVote() {
 
                             {/* Transportation Options - Only show if attending */}
                             {joinable && (
-                                <FormSection title="🚗 Phương tiện di chuyển">
-                                    <div className="space-y-2">
-                                        {TRANSPORT_OPTIONS.map((item) => (
+                                <>
+                                    <FormSection title="✨ Bạn sẽ đi cùng người thân chưa">
+                                        <div className="space-y-2">
                                             <RadioButton
-                                                key={item.value}
-                                                checked={transport === item.value}
-                                                onClick={() => !isSubmitting && setTransport(item.value)}
-                                                label={item.label}
+                                                checked={hasRelative}
+                                                onClick={() => !isSubmitting && setHasRelative(true)}
+                                                label="🎉 Có, tôi sẽ đi cùng người thân"
                                                 disabled={isSubmitting}
                                             />
-                                        ))}
-                                    </div>
-                                </FormSection>
+                                            <RadioButton
+                                                checked={!hasRelative}
+                                                onClick={() => !isSubmitting && setHasRelative(false)}
+                                                label="😢 Không, tôi chỉ đi một mình nha"
+                                                disabled={isSubmitting}
+                                            />
+                                        </div>
+                                    </FormSection>
+                                    <FormSection title="🚗 Phương tiện di chuyển">
+                                        <div className="space-y-2">
+                                            {TRANSPORT_OPTIONS.map((item) => (
+                                                <RadioButton
+                                                    key={item.value}
+                                                    checked={transport === item.value}
+                                                    onClick={() => !isSubmitting && setTransport(item.value)}
+                                                    label={item.label}
+                                                    disabled={isSubmitting}
+                                                />
+                                            ))}
+                                        </div>
+                                    </FormSection>
+                                </>
                             )}
 
                             {/* Message */}

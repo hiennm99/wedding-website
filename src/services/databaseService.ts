@@ -2,10 +2,11 @@
 
 import { createClient, SupabaseClient, PostgrestError, AuthError } from '@supabase/supabase-js';
 
-// Types
+// Types - Updated to match your database schema
 interface AttendeeData {
     attendee: string;
-    joinable: string;
+    joinable: boolean;  // Changed from string to boolean
+    has_relative: boolean;  // Changed from string to boolean
     transport: string;
     message: string;
 }
@@ -17,7 +18,7 @@ interface ServiceResponse<T = unknown> {
     error?: Error | PostgrestError | AuthError | unknown;
 }
 
-// Database schema type
+// Database schema type - Updated to match your actual schema
 type Database = {
     public: {
         Tables: {

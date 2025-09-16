@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import {CircularImage} from "./common/CircularImage.tsx";
-import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
-import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
+import { useState, useEffect } from "react";
 import {FloatingPetals} from "./FloatingPetals.tsx";
+import {FloatingCalendarButton} from "./button/FloatingCalendarButton.tsx";
+import {FloatingLocationButton} from "./button/FloatingLocationButton.tsx";
+import {CircularImage} from "./common/CircularImage.tsx";
 
 const GalleryCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/GalleryCouple.webp';
 
-export const Thankful: React.FC = () => {
+export const Thankful = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showContent, setShowContent] = useState(false);
@@ -95,9 +95,19 @@ export const Thankful: React.FC = () => {
                                         showContent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
                                     }`}>
                                         <div className="space-y-6">
-                                            <h2 className="text-3xl sm:text-2xl lg:text-3xl xl:text-4xl font-['Allura'] text-rose-600 leading-relaxed">
+                                            <h2 className="text-5xl sm:text-2xl lg:text-4xl xl:text-4xl font-['Allura'] text-rose-600 leading-relaxed">
                                                 Sự hiện diện của bạn sẽ làm cho ngày đặc biệt của chúng tôi thêm ý nghĩa và trọn vẹn hơn
                                             </h2>
+
+                                            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-rose-200 shadow-lg">
+                                                <h3 className="flex items-center justify-center mb-3">
+                                                    🚌
+                                                </h3>
+                                                <p className="text-rose-600 text-sm sm:text-base text-center leading-relaxed italic font-light">
+                                                    Sẽ có xe đưa đón cho mọi người<br />
+                                                    <span className="italic font-light">Thời gian và địa điểm sẽ thông báo sau</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
