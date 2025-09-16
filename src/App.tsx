@@ -3,7 +3,8 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
-    Navigate
+    Navigate,
+    useLocation
 } from "react-router";
 import WeddingInvitation from "./components/WeddingInvitation.tsx";
 import WeddingEnvelope from "./components/WeddingEnvelope.tsx";
@@ -68,6 +69,17 @@ const WeddingMusicWithTracking: React.FC = () => {
     return <WeddingEnvelope />;
 };
 
+// ScrollToTop component - tách riêng để sử dụng useLocation
+const ScrollToTop: React.FC = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
+    return null;
+};
+
 const AppRoutes: React.FC = () => {
     const assets = [
         { url: 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp', type: 'image' as const },
@@ -96,10 +108,9 @@ const AppRoutes: React.FC = () => {
         );
     }
 
-
-
     return (
         <div className="App">
+            <ScrollToTop />
             <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-blue-50 to-rose-100" />
             <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
