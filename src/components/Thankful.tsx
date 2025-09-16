@@ -79,7 +79,7 @@ export function Thankful() {
                         {/* Header */}
                         <div className="mb-6">
                             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-rose-600 font-['Allura'] mb-4">
-                                Cảm ơn {attendeeName}! ✨
+                                ✨ Cảm ơn {attendeeName} ✨
                             </h1>
                             <div className="w-24 h-1 bg-gradient-to-r from-pink-400 to-rose-400 mx-auto rounded-full"></div>
                         </div>
@@ -90,18 +90,18 @@ export function Thankful() {
                                 <>
                                     <div className="text-6xl mb-4">🎉</div>
                                     <h2 className="text-xl sm:text-2xl text-rose-700 font-semibold mb-4">
-                                        Tuyệt vời! Chúng tôi rất mong được gặp {attendeeName}!
+                                        Tuyệt vời! Chúng tôi rất mong được gặp anh chị !
                                     </h2>
                                     <p className="text-rose-600 text-lg leading-relaxed">
-                                        Cảm ơn {attendeeName} đã xác nhận tham dự đám cưới của chúng tôi.
-                                        Sự hiện diện của {attendeeName} sẽ làm cho ngày đặc biệt này trở nên ý nghĩa hơn! 💕
+                                        Cảm ơn anh chị đã xác nhận tham dự đám cưới của chúng tôi.
+                                        Sự hiện diện của anh chị sẽ làm cho ngày đặc biệt này trở nên ý nghĩa hơn! 💕
                                     </p>
                                     <div className="bg-gradient-to-r from-pink-100 to-rose-100 rounded-2xl p-4 mt-6">
                                         <p className="text-rose-700 font-medium">
-                                            📅 Hẹn gặp {attendeeName} vào ngày cưới nhé!
+                                            📅 Hẹn gặp anh chị vào ngày cưới nhé!
                                         </p>
                                         <p className="text-rose-600 text-sm mt-2">
-                                            Chúng tôi sẽ gửi thêm thông tin chi tiết sớm thôi!
+                                            Chúng tôi sẽ gửi thêm thông tin chi tiết về lịch trình sớm!
                                         </p>
                                     </div>
                                 </>
@@ -112,13 +112,13 @@ export function Thankful() {
                                         Cảm ơn {attendeeName} đã thông báo!
                                     </h2>
                                     <p className="text-rose-600 text-lg leading-relaxed">
-                                        Chúng tôi hiểu {attendeeName} có những lý do riêng.
-                                        Dù không thể tham dự nhưng tình cảm của {attendeeName}
-                                         dành cho chúng tôi vẫn rất quý giá! 💝
+                                        Chúng tôi hiểu anh chị có những lý do riêng.
+                                        {' '}Dù không thể tham dự nhưng tình cảm của anh chị
+                                        {' '}dành cho chúng tôi vẫn rất quý giá! 💝
                                     </p>
                                     <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl p-4 mt-6">
                                         <p className="text-blue-700 font-medium">
-                                            Chúng tôi sẽ nhớ đến {attendeeName} trong ngày đặc biệt này!
+                                            Chúng tôi sẽ nhớ đến anh chị trong ngày đặc biệt này!
                                         </p>
                                     </div>
                                 </>
