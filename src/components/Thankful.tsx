@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { FloatingPetals } from "./FloatingPetals.tsx";
 import { useAttendeeStore } from "../stores/attendeeStore.ts";
+import {useNavigationStore} from "../stores/navigationStore.ts";
 import {CircularImage} from "./common/CircularImage.tsx";
 
 const GalleryCouple = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/GalleryCouple.webp';
@@ -21,6 +22,8 @@ export function Thankful() {
     } = useAttendeeStore();
 
     const attendeeName = getDisplayName();
+
+    const { resetNavigation } = useNavigationStore();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -47,12 +50,10 @@ export function Thankful() {
 
 
     const handleBackToHome = () => {
-        // Navigate FIRST before clearing store
         navigate('/', { replace: true });
-
-        // Then clear the form data - do this after navigation
         setTimeout(() => {
             resetStore();
+            resetNavigation(); // Reset navigation state nếu cần
         }, 100);
     };
 

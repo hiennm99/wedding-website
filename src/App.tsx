@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
     BrowserRouter as Router,
     Routes,
@@ -12,44 +12,13 @@ import {Thankful} from "./components/Thankful.tsx";
 import {useAssetPreloader} from "./hooks/useAssetPreloader.ts";
 import {LoadingScreen} from "./components/LoadingScreen.tsx";
 import {WeddingVote} from "./components/WeddingVote.tsx";
+import {useNavigationStore} from "./stores/navigationStore.ts";
 
 const Background = 'https://3utqeqt0pa7xbazg.public.blob.vercel-storage.com/images/Background.webp'
 
-// Navigation Context
-interface NavigationContextType {
-    hasVisitedHome: boolean;
-    setHasVisitedHome: (value: boolean) => void;
-}
-
-const NavigationContext = createContext<NavigationContextType>({
-    hasVisitedHome: false,
-    setHasVisitedHome: () => {}
-});
-
-// Navigation Provider - chỉ dùng in-memory state
-const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // Luôn bắt đầu với false, không lưu vào storage
-    const [hasVisitedHome, setHasVisitedHome] = useState(false);
-
-    return (
-        <NavigationContext.Provider value={{ hasVisitedHome, setHasVisitedHome }}>
-            {children}
-        </NavigationContext.Provider>
-    );
-};
-
-// Hook để sử dụng navigation context
-const useNavigation = () => {
-    const context = useContext(NavigationContext);
-    if (!context) {
-        throw new Error('useNavigation must be used within NavigationProvider');
-    }
-    return context;
-};
-
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { hasVisitedHome } = useNavigation();
+    const { hasVisitedHome } = useNavigationStore();
 
     if (!hasVisitedHome) {
         return <Navigate to="/" replace />;
@@ -60,7 +29,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 // Wedding Music component với tracking
 const WeddingMusicWithTracking: React.FC = () => {
-    const { setHasVisitedHome } = useNavigation();
+    const { setHasVisitedHome } = useNavigationStore();
 
     useEffect(() => {
         setHasVisitedHome(true);
@@ -69,7 +38,7 @@ const WeddingMusicWithTracking: React.FC = () => {
     return <WeddingEnvelope />;
 };
 
-// ScrollToTop component - tách riêng để sử dụng useLocation
+// ScrollToTop component
 const ScrollToTop: React.FC = () => {
     const location = useLocation();
 
@@ -150,11 +119,9 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <NavigationProvider>
-            <Router>
-                <AppRoutes />
-            </Router>
-        </NavigationProvider>
+        <Router>
+            <AppRoutes />
+        </Router>
     );
 };
 
