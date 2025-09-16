@@ -1,0 +1,76 @@
+name: Keep Supabase Active
+
+on:
+  schedule:
+    # Chạy mỗi ngày lúc 8:00 UTC (3:00 PM ICT)
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm init -y
+          npm install @supabase/supabase-js
+
+      - name: Keep Supabase Active
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          cat << 'EOF' > keepalive.js
+          const { createClient } = require('@supabase/supabase-js');
+          
+          async function keepAlive() {
+            try {
+              const supabase = createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_ANON_KEY
+              );
+          
+              // Thực hiện một query đơn giản
+              const { data, error } = await supabase
+                .from('_supabase_migrations') // Bảng system của Supabase
+                .select('count')
+                .limit(1);
+          
+              if (error) {
+                console.log('Query with system table failed, trying simple ping...');
+          
+                // Fallback: tạo bảng tạm và query
+                const { error: pingError } = await supabase.rpc('version');
+          
+                if (pingError) {
+                  console.error('Ping failed:', pingError);
+                  process.exit(1);
+                }
+              }
+          
+              console.log('✅ Supabase pinged successfully!');
+              console.log('Timestamp:', new Date().toISOString());
+          
+            } catch (error) {
+              console.error('❌ Error keeping Supabase alive:', error);
+              process.exit(1);
+            }
+          }
+          
+          keepAlive();
+          EOF
+          
+          node keepalive.js
+
+      - name: Log completion
+        run: |
+          echo "Supabase keepalive completed at $(date)"
