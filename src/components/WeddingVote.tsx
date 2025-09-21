@@ -209,8 +209,9 @@ export function WeddingVote() {
                                     onChange={(e) => setMessage(e.target.value)}
                                     placeholder="Gửi lời chúc mừng đến Hiền & Vi..."
                                     className="w-full italic font-light bg-white border-2 border-pink-200 rounded-lg px-4 py-3 text-rose-700 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 resize-none transition-colors"
-                                    rows={4}
                                     disabled={isSubmitting}
+                                    rows={4}
+                                    wrap="off"
                                 />
                             </FormSection>
 

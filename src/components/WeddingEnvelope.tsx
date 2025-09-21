@@ -284,6 +284,7 @@ export const WeddingEnvelope: React.FC = () => {
                     </div>
                 )}
 
+
                 {/* Enhanced CSS animations */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
@@ -340,7 +341,9 @@ export const WeddingEnvelope: React.FC = () => {
                         }
                     `
                 }} />
+
             </div>
+
         );
     }
 

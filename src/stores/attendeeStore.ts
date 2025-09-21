@@ -37,7 +37,7 @@ export const useAttendeeStore = create<AttendeeState>()(
             isSubmitted: false,
 
             // Actions
-            setAttendee: (name: string) => set({ name: name.trim() }),
+            setAttendee: (name: string) => set({ name: name }),
 
             setJoinable: (joinable: boolean) => set({ joinable }),
 
@@ -45,7 +45,7 @@ export const useAttendeeStore = create<AttendeeState>()(
 
             setTransport: (transport: string) => set({ transport }),
 
-            setMessage: (message: string) => set({ message: message.trim() }),
+            setMessage: (message: string) => set({ message: message }),
 
             setSubmitted: (submitted: boolean) => set({ isSubmitted: submitted }),
 
@@ -61,7 +61,7 @@ export const useAttendeeStore = create<AttendeeState>()(
             // Computed values
             getDisplayName: () => {
                 const { name } = get();
-                return name.trim() || 'Bạn';
+                return name|| 'Bạn';
             },
         }),
         {
